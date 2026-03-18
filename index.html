@@ -22,7 +22,6 @@
             background-color: var(--bg-base); 
             color: var(--text-main); 
             overflow: hidden; 
-            /* Fondo de cuadrícula tecnológica */
             background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
             background-size: 30px 30px;
         }
@@ -42,14 +41,14 @@
         }
         .btn-ingreso:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px var(--accent-glow); }
 
-        /* ================= VISTA 1: INICIO ================= */
+        /* VISTA 1: INICIO */
         #vista-inicio { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; animation: fadeIn 0.8s ease; }
         h1 { font-size: 5rem; font-weight: 900; line-height: 1.1; margin-bottom: 20px; text-transform: uppercase; background: linear-gradient(135deg, #fff 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 20px rgba(0,229,255,0.2)); }
         .subtitulo { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; margin-bottom: 50px; line-height: 1.6; }
         .pilares { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
         .pilar { padding: 10px 25px; border-radius: 5px; border-left: 3px solid var(--accent); background: rgba(255,255,255,0.03); font-weight: bold; letter-spacing: 2px; color: #fff; }
 
-        /* ================= VISTA 2: APP FÉNIX ================= */
+        /* VISTA 2: APP FÉNIX */
         #vista-fenix { display: none; height: 100vh; padding-top: 80px; animation: fadeIn 0.5s ease; }
 
         /* PANTALLA LOGIN */
@@ -70,7 +69,6 @@
         
         .divider { display: flex; align-items: center; margin: 20px 0; color: #444; font-size: 12px; }
         .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: rgba(255,255,255,0.05); margin: 0 10px; }
-        
         .error-msg { color: #ff4d4d; font-size: 13px; margin-top: 15px; display: none; }
 
         /* INTERFAZ CHAT */
@@ -93,7 +91,6 @@
         .bienvenida img { width: 100px; height: 100px; border-radius: 20px; margin-bottom: 20px; filter: grayscale(100%); opacity: 0.5; object-fit: cover;}
         .bienvenida h2 { font-size: 28px; font-weight: 300; }
         
-        /* BURBUJAS DE CHAT */
         .fila-msg { display: flex; gap: 15px; animation: slideUp 0.4s ease; width: 100%; max-width: 900px; margin: 0 auto; }
         .fila-msg.user { justify-content: flex-end; }
         .avatar-ia { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); box-shadow: 0 0 10px var(--accent-glow); object-fit: cover; flex-shrink: 0; }
@@ -102,14 +99,15 @@
         .burbuja.user { background: var(--bubble-user); color: #fff; border-radius: 20px 20px 4px 20px; border: 1px solid rgba(255,255,255,0.05); }
         .burbuja.ia { background: var(--bubble-ia); color: var(--text-main); padding-top: 5px; }
 
-        /* ANIMACIÓN DE CARGA (TRES PUNTITOS) */
+        /* ZONA DE CARGA SEGURA (No se borra por Firebase) */
+        #zona-carga-segura { display: none; padding: 0 40px 20px; }
         .indicador-carga { display: flex; gap: 5px; padding: 10px 0; }
         .punto { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
         .punto:nth-child(1) { animation-delay: -0.32s; }
         .punto:nth-child(2) { animation-delay: -0.16s; }
 
         /* INPUT AREA */
-        .zona-input { padding: 30px 40px; background: linear-gradient(transparent, var(--bg-base) 20%); display: flex; justify-content: center; }
+        .zona-input { padding: 20px 40px 40px; background: linear-gradient(transparent, var(--bg-base) 30%); display: flex; justify-content: center; }
         .caja-input { width: 100%; max-width: 900px; display: flex; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 8px 10px 8px 25px; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .caja-input:focus-within { border-color: var(--accent); box-shadow: 0 0 20px rgba(0, 229, 255, 0.15); }
         .caja-input input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; }
@@ -118,12 +116,9 @@
         .btn-enviar:hover { background: var(--accent); transform: scale(1.05); }
         .btn-enviar svg { width: 20px; height: 20px; transform: translateX(2px); }
 
-        /* ANIMACIONES CLAVE */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); box-shadow: 0 0 10px var(--accent); } }
-
-        /* SCROLLBAR INVISIBLE */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -197,6 +192,15 @@
                     </div>
                 </div>
 
+                <div id="zona-carga-segura">
+                    <div class="fila-msg ia">
+                        <img src="fenix-logo.jpg" class="avatar-ia" onerror="this.style.display='none'">
+                        <div class="burbuja ia indicador-carga">
+                            <div class="punto"></div><div class="punto"></div><div class="punto"></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="zona-input">
                     <div class="caja-input">
                         <input type="text" id="input-chat" placeholder="Conéctate con el núcleo Fénix..." autocomplete="off">
@@ -207,11 +211,9 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <script type="module">
-        // 1. CONTROL DE NAVEGACIÓN
         window.cambiarVista = function(vista) {
             if(vista === 'inicio') {
                 document.getElementById('vista-inicio').style.display = 'flex';
@@ -222,7 +224,6 @@
             }
         }
 
-        // 2. IMPORTACIONES DE FIREBASE
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -240,7 +241,7 @@
 
         let userActual = null;
         let unsubscribe = null; 
-        const RUTA_LOGO = "fenix-logo.jpg"; // LA RUTA EXACTA DEL JPG
+        const RUTA_LOGO = "fenix-logo.jpg";
         const URL_RENDER = "https://fenix-backend-uqbg.onrender.com/api/chat";
 
         const DOM = {
@@ -249,15 +250,15 @@
             error: document.getElementById('error-box'),
             mensajes: document.getElementById('contenedor-mensajes'),
             input: document.getElementById('input-chat'),
-            bienvenida: document.getElementById('bienvenida-msg')
+            bienvenida: document.getElementById('bienvenida-msg'),
+            carga: document.getElementById('zona-carga-segura') // Nueva zona
         };
 
-        // 3. LÓGICA DE AUTENTICACIÓN
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
 
         document.getElementById('btn-google').addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando con Google."); }});
         document.getElementById('btn-login-mail').addEventListener('click', async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Correo o contraseña incorrectos."); }});
-        document.getElementById('btn-reg-mail').addEventListener('click', async () => { try { await createUserWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Fallo al crear cuenta. La contraseña debe tener 6+ caracteres."); }});
+        document.getElementById('btn-reg-mail').addEventListener('click', async () => { try { await createUserWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Fallo al crear cuenta. Mínimo 6 caracteres."); }});
         document.getElementById('btn-salir').addEventListener('click', () => signOut(auth));
 
         onAuthStateChanged(auth, (user) => {
@@ -279,7 +280,6 @@
             }
         });
 
-        // 4. LÓGICA DEL CHAT
         function iniciarChat() {
             if (!userActual) return;
             const q = query(collection(db, `chats_${userActual.uid}`), orderBy("timestamp", "asc"));
@@ -303,36 +303,33 @@
             
             const refChat = collection(db, `chats_${userActual.uid}`);
             
-            // Guardar usuario
+            // 1. Guardar tu mensaje
             try { await addDoc(refChat, { texto: texto, emisor: "user", timestamp: serverTimestamp() }); } catch(e) { return; }
             
-            // Crear ID único para la animación y mostrarla
-            const idAnimacion = "carga-" + Date.now();
-            renderizarCarga(idAnimacion);
+            // 2. Encender animación independiente (¡Ya no se borrará!)
+            DOM.carga.style.display = 'block';
+            scrollAbajo();
 
             try {
-                // Hablar con Render
+                // 3. Hablar con Render
                 const res = await fetch(URL_RENDER, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mensaje: texto }) });
                 const data = await res.json();
                 
-                // Borrar animación usando el ID único
-                const elementoCarga = document.getElementById(idAnimacion);
-                if(elementoCarga) elementoCarga.remove();
+                // 4. Apagar animación
+                DOM.carga.style.display = 'none';
                 
-                // Guardar respuesta de IA
+                // 5. Guardar respuesta
                 if(data.respuesta) {
                     await addDoc(refChat, { texto: data.respuesta, emisor: "ia", timestamp: serverTimestamp() });
                 } else if(data.error) {
                     await addDoc(refChat, { texto: "⚠️ " + data.error, emisor: "ia", timestamp: serverTimestamp() });
                 }
             } catch (error) {
-                const elementoCarga = document.getElementById(idAnimacion);
-                if(elementoCarga) elementoCarga.remove();
-                await addDoc(refChat, { texto: "🔌 Error de conexión. El servidor central no responde.", emisor: "ia", timestamp: serverTimestamp() });
+                DOM.carga.style.display = 'none';
+                await addDoc(refChat, { texto: "🔌 Error de conexión con el núcleo central.", emisor: "ia", timestamp: serverTimestamp() });
             }
         }
 
-        // 5. RENDERIZADO VISUAL
         function renderizarMensaje(texto, emisor) {
             const esUser = emisor === "user";
             const html = `
@@ -344,22 +341,8 @@
             DOM.mensajes.insertAdjacentHTML('beforeend', html);
         }
 
-        function renderizarCarga(id) {
-            const html = `
-                <div class="fila-msg ia" id="${id}">
-                    <img src="${RUTA_LOGO}" class="avatar-ia" onerror="this.style.display='none'">
-                    <div class="burbuja ia indicador-carga">
-                        <div class="punto"></div><div class="punto"></div><div class="punto"></div>
-                    </div>
-                </div>
-            `;
-            DOM.mensajes.insertAdjacentHTML('beforeend', html);
-            scrollAbajo();
-        }
-
         function scrollAbajo() { DOM.mensajes.scrollTop = DOM.mensajes.scrollHeight; }
         
-        // Eventos
         document.getElementById('btn-enviar').addEventListener('click', enviarMsg);
         DOM.input.addEventListener("keypress", (e) => { if (e.key === "Enter") enviarMsg(); });
     </script>
