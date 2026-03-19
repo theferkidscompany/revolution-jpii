@@ -3,35 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revolution JPII | Inicio</title>
+    <title>Revolution JPII | Portal Oficial</title>
     <style>
         :root {
             --bg-base: #030305;
+            --bg-pilar: rgba(255, 255, 255, 0.03);
+            --bg-pilar-hover: rgba(0, 229, 255, 0.08);
             --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.4);
             --text-main: #ffffff;
-            --text-dim: #8892b0;
+            --text-muted: #8892b0;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-main); }
-        
-        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; background: rgba(3, 3, 5, 0.8); border-bottom: 1px solid rgba(0, 229, 255, 0.1); }
-        .logo-nav { display: flex; align-items: center; gap: 15px; font-weight: 800; font-size: 20px; letter-spacing: 2px; }
-        .logo-nav img { width: 35px; height: 35px; border-radius: 8px; border: 1px solid var(--accent); }
-        
-        /* El botón ahora es un enlace (etiqueta a) */
-        .btn-ingreso { background: rgba(0, 229, 255, 0.1); color: var(--accent); border: 1px solid var(--accent); padding: 10px 25px; border-radius: 30px; font-weight: bold; text-decoration: none; transition: 0.3s; }
-        .btn-ingreso:hover { background: var(--accent); color: #000; box-shadow: 0 0 20px rgba(0,229,255,0.3); }
 
-        #vista-inicio { height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0 20px; }
-        h1 { font-size: 5rem; font-weight: 900; margin-bottom: 20px; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .subtitulo { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; margin-bottom: 50px; line-height: 1.6; }
-        .pilares { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-        .pilar { padding: 10px 25px; border-radius: 5px; border-left: 3px solid var(--accent); background: rgba(255,255,255,0.03); font-weight: bold; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-base); 
+            color: var(--text-main); 
+            overflow: hidden; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            /* Fondo de profundidad cuántica */
+            background-image: 
+                radial-gradient(circle at center, rgba(16, 20, 40, 0.5) 0%, var(--bg-base) 70%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.02'%3E%3Ccircle fill='%23ffffff' cx='25' cy='25' r='1'/%3E%3Ccircle fill='%23ffffff' cx='75' cy='75' r='1'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: cover, 150px 150px;
+        }
+
+        /* --- NAVEGACIÓN ESTILO CRISTAL --- */
+        nav { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 20px 50px; 
+            background: rgba(3, 3, 5, 0.6); 
+            backdrop-filter: blur(20px); 
+            position: fixed; width: 100%; top: 0; z-index: 1000; 
+            border-bottom: 1px solid rgba(0, 229, 255, 0.08); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideInDown 0.6s ease-out;
+        }
+        .logo-nav { 
+            display: flex; align-items: center; gap: 15px; 
+            font-weight: 800; font-size: 22px; letter-spacing: 2px; 
+            text-transform: uppercase;
+            cursor: pointer;
+            color: #fff;
+            transition: 0.3s;
+        }
+        .logo-nav img { 
+            width: 38px; height: 38px; border-radius: 8px; 
+            border: 2px solid var(--accent); 
+            box-shadow: 0 0 15px var(--accent-glow);
+            object-fit: cover;
+        }
+        .logo-nav:hover {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+        
+        /* BOTÓN INGRESO CON EFECTO DE BRILLO CONSTANTE (SHIMMER) */
+        .btn-ingreso { 
+            position: relative;
+            background: rgba(0, 229, 255, 0.1); 
+            color: var(--accent); 
+            border: 1px solid var(--accent); 
+            padding: 12px 30px; 
+            border-radius: 30px; 
+            font-weight: bold; 
+            text-decoration: none; 
+            transition: 0.4s ease; 
+            text-transform: uppercase; letter-spacing: 1px; font-size: 13px;
+            overflow: hidden;
+            box-shadow: 0 0 15px var(--accent-glow) inset;
+        }
+        .btn-ingreso:hover { 
+            background: var(--accent); 
+            color: #000; 
+            box-shadow: 0 0 30px var(--accent);
+            transform: translateY(-2px);
+        }
+        /* Efecto de brillo constante */
+        .btn-ingreso::after {
+            content: "";
+            position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent 20%, rgba(255,255,255,0.1) 50%, transparent 80%);
+            animation: shimmer 4s infinite;
+        }
+
+        /* ================= SECCIÓN INICIO - ARTE MÁXIMO ================= */
+        #vista-inicio { 
+            flex: 1; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; 
+            text-align: center; 
+            padding: 80px 20px 0; /* padding superior compensa nav fixed */
+        }
+
+        /* TÍTULO H1 DE IMPACTO MASIVO */
+        h1 { 
+            font-size: 8rem; /* Enorme */
+            font-weight: 900; 
+            line-height: 0.95; 
+            margin-bottom: 25px; 
+            text-transform: uppercase; 
+            letter-spacing: -3px;
+            /* Degradado de impacto animado */
+            background: linear-gradient(135deg, #fff 0%, #fff 40%, var(--accent) 50%, #fff 60%, #fff 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            /* Sombra neón glow fuerte */
+            filter: drop-shadow(0 0 25px rgba(0,229,255,0.25)); 
+            animation: textGradient 6s linear infinite, fadeInUp 1s ease-out;
+        }
+        
+        .subtitulo { 
+            font-size: 1.4rem; 
+            color: var(--text-muted); 
+            max-width: 750px; 
+            margin-bottom: 60px; 
+            line-height: 1.6; 
+            font-weight: 300;
+            animation: fadeInUp 1s ease-out 0.3s both; /* Retraso para entrada secuencial */
+        }
+
+        /* --- PILARES INTERACTIVOS ESTILO CARTA --- */
+        .pilares { 
+            display: flex; 
+            gap: 30px; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+        .pilar { 
+            padding: 20px 40px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.03); 
+            background: var(--bg-pilar); 
+            backdrop-filter: blur(10px);
+            font-weight: bold; 
+            letter-spacing: 3px; 
+            color: #fff; 
+            cursor: pointer;
+            transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); /* Entrada/salida suave */
+            position: relative;
+            overflow: hidden;
+        }
+        /* Borde inferior de neón constante */
+        .pilar::after {
+            content: "";
+            position: absolute; bottom: 0; left: 0;
+            width: 100%; height: 2px;
+            background: var(--accent);
+            opacity: 0.3;
+            transition: 0.3s;
+        }
+
+        /* EFECTO HOVER ARTE (Mágico) */
+        .pilar:hover { 
+            background: var(--bg-pilar-hover);
+            border-color: rgba(0, 229, 255, 0.3); 
+            transform: translateY(-10px) scale(1.03); /* Flota, sube, crece */
+            color: #fff;
+            text-shadow: 0 0 10px var(--accent);
+            /* Brillo neón externo potente */
+            box-shadow: 
+                0 15px 40px rgba(0, 0, 0, 0.6), 
+                0 0 30px var(--accent-glow);
+        }
+        .pilar:hover::after {
+            opacity: 1;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* ================= ANIMACIONES CLAVE ================= */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); box-shadow: 0 0 10px var(--accent); } }
+        
+        /* Animación del degradado de texto */
+        @keyframes textGradient {
+            to { background-position: 200% center; }
+        }
+        
+        /* Animación del brillo del botón */
+        @keyframes shimmer {
+            0% { left: -150%; }
+            50% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        /* MEDIA QUERIES PARA MÓVILES (Adaptabilidad) */
+        @media (max-width: 1024px) {
+            h1 { font-size: 6rem; letter-spacing: -2px; }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 20px 30px; }
+            h1 { font-size: 4rem; letter-spacing: -1px; margin-bottom: 20px; }
+            .subtitulo { font-size: 1.1rem; margin-bottom: 40px; }
+            .pilares { gap: 15px; }
+            .pilar { padding: 15px 30px; font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            nav { padding: 15px; flex-direction: column; gap: 15px; }
+            #vista-inicio { padding-top: 120px; }
+            h1 { font-size: 3rem; }
+        }
     </style>
 </head>
 <body>
     <nav>
-        <div class="logo-nav">
+        <div class="logo-nav" onclick="cambiarVista('inicio')">
             <img src="fenix-logo.jpg" alt="F" onerror="this.style.display='none'"> 
             REVOLUTION JPII
         </div>
@@ -41,6 +224,7 @@
     <div id="vista-inicio">
         <h1>El Futuro del JPII</h1>
         <p class="subtitulo">Una campaña basada en la transparencia, el liderazgo estudiantil y la integración de Inteligencia Artificial.</p>
+        
         <div class="pilares">
             <div class="pilar">AMA LLULLA</div>
             <div class="pilar">AMA SUA</div>
@@ -48,5 +232,4 @@
         </div>
     </div>
 </body>
-</html>
 </html>
