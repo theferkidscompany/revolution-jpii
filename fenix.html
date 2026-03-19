@@ -16,30 +16,15 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        body { 
-            background: radial-gradient(circle at top right, #0a1128 0%, var(--bg-deep) 100%);
-            color: var(--text-main); 
-            overflow: hidden; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-        }
+        body { background: radial-gradient(circle at top right, #0a1128 0%, var(--bg-deep) 100%); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER SUPERIOR */
-        .top-bar { 
-            padding: 15px 30px; 
-            background: rgba(3, 3, 5, 0.5); 
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0, 229, 255, 0.1); 
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 100;
-        }
+        /* HEADER */
+        .top-bar { padding: 15px 30px; background: rgba(3, 3, 5, 0.5); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 229, 255, 0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
         .back-link:hover { color: var(--accent); transform: translateX(-5px); }
         .brand-title { font-weight: 900; color: var(--accent); letter-spacing: 2px; text-shadow: 0 0 10px var(--glow); }
 
-        /* PANTALLA LOGIN */
+        /* LOGIN */
         #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 500; background: var(--bg-deep); }
         .login-box { background: var(--bg-glass); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
         .login-box img { width: 90px; height: 90px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 2px solid var(--accent); box-shadow: 0 0 20px var(--glow); }
@@ -54,12 +39,13 @@
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--glow); }
         .btn-secondary { background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
         .btn-secondary:hover { background: rgba(255,255,255,0.05); }
-        .error-msg { color: #ff4d4d; font-size: 13px; display: none; margin-top: 10px; }
+        .error-msg { color: #ff4d4d; font-size: 13px; display: none; margin-top: 15px; line-height: 1.4; padding: 10px; background: rgba(255, 77, 77, 0.1); border-radius: 8px; border: 1px solid rgba(255, 77, 77, 0.3);}
+        .success-msg { color: #00e5ff; font-size: 13px; display: none; margin-top: 15px; line-height: 1.4; padding: 10px; background: rgba(0, 229, 255, 0.1); border-radius: 8px; border: 1px solid rgba(0, 229, 255, 0.3);}
 
-        /* APLICACIÓN PRINCIPAL */
+        /* APP CHAT */
         #chat-app { display: none; width: 100%; height: calc(100vh - 56px); flex-direction: row; }
         
-        /* SIDEBAR (Historial) */
+        /* SIDEBAR */
         .sidebar { width: 300px; background: var(--bg-glass); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; padding: 25px 20px; }
         .user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.1); border-radius: 15px; margin-bottom: 25px; }
         .user-card img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
@@ -77,7 +63,7 @@
         .btn-logout { background: transparent; border: none; color: #666; padding: 15px; cursor: pointer; border-radius: 12px; transition: 0.3s; font-weight: bold; text-align: left; display: flex; align-items: center; gap: 10px; }
         .btn-logout:hover { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); }
 
-        /* AREA DEL CHAT */
+        /* AREA CHAT CENTRAL */
         .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, rgba(0,229,255,0.02) 0%, transparent 70%); }
         .mensajes-container { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 30px; scroll-behavior: smooth; }
         
@@ -130,17 +116,31 @@
         <div class="login-box">
             <img src="fenix-logo.jpg" alt="Logo" onerror="this.style.display='none'">
             <h2>Fénix IA</h2>
-            <p>Acceso al Núcleo Cuántico</p>
+            <p>Acceso Seguro Estudiantil</p>
+            
             <input type="email" id="email-in" class="input-form" placeholder="Correo electrónico">
             <input type="password" id="pass-in" class="input-form" placeholder="Contraseña secreta">
+            
             <button class="btn-full btn-primary" id="btn-login-mail">Iniciar Sesión</button>
-            <button class="btn-full btn-secondary" id="btn-reg-mail">Crear Cuenta</button>
-            <div style="margin:20px 0; color:#555; font-size:12px;">O INGRESA CON</div>
+            <button class="btn-full btn-secondary" id="btn-reg-mail">Crear Cuenta (Requiere Verificación)</button>
+            
+            <div style="margin:20px 0; display: flex; align-items: center; justify-content: center;">
+                <span style="height: 1px; background: rgba(255,255,255,0.1); flex: 1;"></span>
+                <span style="color:#555; font-size:12px; margin: 0 10px;">O INGRESA CON</span>
+                <span style="height: 1px; background: rgba(255,255,255,0.1); flex: 1;"></span>
+            </div>
+            
             <button class="btn-full btn-secondary" id="btn-google" style="display:flex; justify-content:center; align-items:center; gap:10px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+                </svg>
                 Google
             </button>
             <div id="error-box" class="error-msg"></div>
+            <div id="success-box" class="success-msg"></div>
         </div>
     </div>
 
@@ -159,8 +159,7 @@
                 Nuevo Chat
             </button>
             
-            <div class="lista-chats" id="lista-chats">
-                </div>
+            <div class="lista-chats" id="lista-chats"></div>
 
             <button class="btn-logout" id="btn-salir">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
@@ -196,8 +195,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // IMPORTANTE: Añadí doc, updateDoc para organizar los chats
+        // AGREGADO: sendEmailVerification
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -212,7 +211,7 @@
         const provider = new GoogleAuthProvider();
 
         let userActual = null;
-        let chatActualId = null; // Para saber en qué chat estamos escribiendo
+        let chatActualId = null; 
         let unsubscribeMensajes = null; 
         let unsubscribeLista = null;
 
@@ -223,6 +222,7 @@
             login: document.getElementById('login-screen'),
             app: document.getElementById('chat-app'),
             error: document.getElementById('error-box'),
+            success: document.getElementById('success-box'),
             listaChats: document.getElementById('lista-chats'),
             mensajes: document.getElementById('contenedor-mensajes'),
             input: document.getElementById('input-chat'),
@@ -230,16 +230,61 @@
             carga: document.getElementById('zona-carga-segura')
         };
 
-        const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
+        const showError = (msg) => { DOM.success.style.display = 'none'; DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
+        const showSuccess = (msg) => { DOM.error.style.display = 'none'; DOM.success.innerText = msg; DOM.success.style.display = 'block'; };
 
-        // AUTH
-        document.getElementById('btn-google').addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando."); }});
-        document.getElementById('btn-login-mail').addEventListener('click', async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Error de credenciales."); }});
-        document.getElementById('btn-reg-mail').addEventListener('click', async () => { try { await createUserWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Error al crear cuenta."); }});
+        // ================= AUTHENTICATION LOGIC =================
+
+        // 1. Google Auth (No requiere verificación de correo adicional)
+        document.getElementById('btn-google').addEventListener('click', async () => { 
+            try { 
+                await signInWithPopup(auth, provider); 
+            } catch(e) { 
+                showError("Asegúrate de haber agregado '127.0.0.1' en Dominios Autorizados de Firebase."); 
+            }
+        });
+
+        // 2. Login con Correo (Con filtro Anti-Bots / No verificados)
+        document.getElementById('btn-login-mail').addEventListener('click', async () => { 
+            try { 
+                const cred = await signInWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); 
+                
+                // Si entra con correo, bloqueamos si no lo ha verificado
+                if (!cred.user.emailVerified) {
+                    showError("⚠️ Cuenta NO Verificada. Por favor, revisa la bandeja de entrada de tu correo (o la carpeta de SPAM) y haz clic en el enlace de verificación de Firebase antes de entrar.");
+                    await signOut(auth); // Lo sacamos a patadas
+                }
+            } catch(e) { 
+                showError("Correo o contraseña incorrectos, o la cuenta no existe."); 
+            }
+        });
+
+        // 3. Registro Anti-Bots (Manda correo)
+        document.getElementById('btn-reg-mail').addEventListener('click', async () => { 
+            try { 
+                const cred = await createUserWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); 
+                
+                // Manda el correo oficial de Firebase
+                await sendEmailVerification(cred.user);
+                
+                showSuccess("✅ ¡CUENTA CREADA!\nTe acabamos de enviar un enlace a tu correo. Ábrelo para verificar que eres humano. Luego podrás iniciar sesión.");
+                
+                // Lo cerramos automáticamente para que tenga que ir a su correo
+                await signOut(auth);
+            } catch(e) { 
+                showError("Error: El correo ya está registrado o la contraseña es muy débil (Mínimo 6 letras/números)."); 
+            }
+        });
+
         document.getElementById('btn-salir').addEventListener('click', () => signOut(auth));
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // Doble chequeo de seguridad (Por si Firebase intenta loguearlo automáticamente tras crear cuenta)
+                if(user.providerData[0].providerId === 'password' && !user.emailVerified) {
+                    return; // No lo dejamos pasar
+                }
+
                 userActual = user;
                 DOM.login.style.display = 'none';
                 DOM.app.style.display = 'flex';
@@ -259,7 +304,8 @@
             }
         });
 
-        // 1. CARGAR EL MENÚ LATERAL (Chat 1, Chat 2...)
+        // ================= SISTEMA DE CHATS =================
+
         function cargarHistorialDeChats() {
             if (!userActual) return;
             const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
@@ -283,7 +329,6 @@
                     div.onclick = () => abrirChat(documento.id);
                     DOM.listaChats.appendChild(div);
 
-                    // Si entramos por primera vez, abrir el chat más reciente automáticamente
                     if(esElPrimero && !chatActualId) {
                         abrirChat(documento.id);
                     }
@@ -292,7 +337,6 @@
             });
         }
 
-        // 2. CREAR UN NUEVO CHAT EN LA BASE DE DATOS
         async function crearNuevoChat(nombreOpcional) {
             if (!userActual) return;
             const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
@@ -308,13 +352,9 @@
 
         document.getElementById('btn-nuevo-chat').addEventListener('click', () => crearNuevoChat());
 
-        // 3. ABRIR UN CHAT ESPECÍFICO Y LEER SUS MENSAJES
         function abrirChat(idChat) {
             chatActualId = idChat;
-            
-            // Remarcar el activo en la UI
             document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-            // Refrescar el listener de la lista hará el active automático, pero por velocidad visual lo hacemos manual
             
             if(unsubscribeMensajes) unsubscribeMensajes();
             
@@ -333,7 +373,6 @@
             });
         }
 
-        // 4. ENVIAR MENSAJE
         async function enviarMsg() {
             const texto = DOM.input.value.trim();
             if (texto === "" || !userActual || !chatActualId) return;
@@ -342,7 +381,6 @@
             const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
             const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
             
-            // Guardar usuario y actualizar fecha del chat para que suba en la lista
             try { 
                 await addDoc(refMensajes, { texto: texto, emisor: "user", timestamp: serverTimestamp() }); 
                 await updateDoc(refChatPrincipal, { actualizado: serverTimestamp() });
@@ -364,7 +402,7 @@
                 }
             } catch (error) {
                 DOM.carga.style.display = 'none';
-                await addDoc(refMensajes, { texto: "🔌 Error de conexión.", emisor: "ia", timestamp: serverTimestamp() });
+                await addDoc(refMensajes, { texto: "🔌 Error de conexión con Fénix.", emisor: "ia", timestamp: serverTimestamp() });
             }
         }
 
@@ -380,7 +418,6 @@
         }
 
         function scrollAbajo() { DOM.mensajes.scrollTop = DOM.mensajes.scrollHeight; }
-        
         document.getElementById('btn-enviar').addEventListener('click', enviarMsg);
         DOM.input.addEventListener("keypress", (e) => { if (e.key === "Enter") enviarMsg(); });
     </script>
