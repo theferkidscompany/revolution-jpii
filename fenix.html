@@ -3,92 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fénix Core | AI</title>
+    <title>Fénix IA | Dashboard</title>
     <style>
         :root {
-            --bg-base: #030305;
-            --bg-panel: #0a0a0f;
+            --bg-deep: #030305;
+            --bg-glass: rgba(10, 10, 15, 0.7);
             --accent: #00e5ff;
+            --accent-dark: #0077ff;
             --text-main: #ffffff;
-            --text-dim: #8892b0;
-            --bubble-user: #1e1e24;
-            --bubble-ia: transparent;
+            --text-muted: #8892b0;
+            --glow: rgba(0, 229, 255, 0.4);
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background-color: var(--bg-base); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
         
-        /* HEADER SENCILLO PARA VOLVER */
-        .top-bar { padding: 15px 30px; background: var(--bg-panel); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .back-link { color: var(--text-dim); text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .back-link:hover { color: var(--accent); }
+        body { 
+            background: radial-gradient(circle at top right, #0a1128 0%, var(--bg-deep) 100%);
+            color: var(--text-main); 
+            overflow: hidden; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+
+        /* HEADER SUPERIOR */
+        .top-bar { 
+            padding: 15px 30px; 
+            background: rgba(3, 3, 5, 0.5); 
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1); 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 100;
+        }
+        .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
+        .back-link:hover { color: var(--accent); transform: translateX(-5px); }
+        .brand-title { font-weight: 900; color: var(--accent); letter-spacing: 2px; text-shadow: 0 0 10px var(--glow); }
+
+        /* PANTALLA LOGIN */
+        #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 500; background: var(--bg-deep); }
+        .login-box { background: var(--bg-glass); backdrop-filter: blur(20px); padding: 50px 40px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+        .login-box img { width: 90px; height: 90px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; border: 2px solid var(--accent); box-shadow: 0 0 20px var(--glow); }
+        .login-box h2 { font-size: 28px; margin-bottom: 5px; font-weight: 800; }
+        .login-box p { color: var(--text-muted); margin-bottom: 30px; font-size: 14px; }
         
-        /* LOGIN */
-        #login-screen { position: absolute; top: 60px; left: 0; width: 100%; height: calc(100vh - 60px); display: flex; justify-content: center; align-items: center; z-index: 500; background: var(--bg-base); }
-        .login-box { background: var(--bg-panel); padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-        .login-box img { width: 80px; border-radius: 15px; margin-bottom: 20px; border: 2px solid var(--accent); }
-        .input-form { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; outline: none; }
-        .btn-full { width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .btn-primary { background: var(--accent); color: #000; }
-        .btn-secondary { background: transparent; color: var(--text-dim); border: 1px solid rgba(255,255,255,0.1); }
+        .input-form { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; outline: none; transition: 0.3s; }
+        .input-form:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0,229,255,0.2); }
+        
+        .btn-full { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; }
+        .btn-primary { background: linear-gradient(90deg, var(--accent), var(--accent-dark)); color: #000; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--glow); }
+        .btn-secondary { background: transparent; color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); }
         .error-msg { color: #ff4d4d; font-size: 13px; display: none; margin-top: 10px; }
 
-        /* CHAT INTERFAZ */
-        #chat-app { display: none; width: 100%; height: calc(100vh - 60px); }
-        .sidebar { width: 280px; background: var(--bg-panel); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; padding: 20px; }
-        .user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(0, 229, 255, 0.05); border-radius: 15px; margin-bottom: 20px; }
-        .user-card img { width: 40px; height: 40px; border-radius: 50%; }
+        /* APLICACIÓN PRINCIPAL */
+        #chat-app { display: none; width: 100%; height: calc(100vh - 56px); flex-direction: row; }
         
-        /* BOTÓN NUEVO CHAT */
-        .btn-nuevo-chat { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-bottom: auto; }
-        .btn-nuevo-chat:hover { background: var(--accent); color: #000; }
+        /* SIDEBAR (Historial) */
+        .sidebar { width: 300px; background: var(--bg-glass); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; padding: 25px 20px; }
+        .user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.1); border-radius: 15px; margin-bottom: 25px; }
+        .user-card img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+        .user-info h4 { font-size: 15px; margin-bottom: 2px; }
+        .user-info span { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
         
-        .btn-logout { background: transparent; border: none; color: var(--text-dim); padding: 15px; cursor: pointer; border-radius: 10px; transition: 0.3s; font-weight: bold; text-align: left; }
-        .btn-logout:hover { color: #ff4d4d; }
+        .btn-nuevo-chat { background: transparent; border: 1px dashed var(--accent); color: var(--accent); padding: 14px; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-nuevo-chat:hover { background: rgba(0, 229, 255, 0.1); box-shadow: 0 0 15px var(--glow); }
 
-        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; }
-        .mensajes-container { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 25px; }
-        .bienvenida { text-align: center; margin: auto; opacity: 0.5; }
+        .lista-chats { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .chat-item { padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-size: 14px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid transparent; }
+        .chat-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        .chat-item.active { background: rgba(0, 229, 255, 0.1); color: var(--accent); border-color: rgba(0, 229, 255, 0.2); font-weight: bold; }
+
+        .btn-logout { background: transparent; border: none; color: #666; padding: 15px; cursor: pointer; border-radius: 12px; transition: 0.3s; font-weight: bold; text-align: left; display: flex; align-items: center; gap: 10px; }
+        .btn-logout:hover { color: #ff4d4d; background: rgba(255, 77, 77, 0.1); }
+
+        /* AREA DEL CHAT */
+        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, rgba(0,229,255,0.02) 0%, transparent 70%); }
+        .mensajes-container { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 30px; scroll-behavior: smooth; }
         
-        .fila-msg { display: flex; gap: 15px; width: 100%; max-width: 900px; margin: 0 auto; }
+        .bienvenida { text-align: center; margin: auto; animation: fadeIn 1s; }
+        .bienvenida img { width: 120px; height: 120px; border-radius: 30px; filter: grayscale(100%) opacity(0.3); margin-bottom: 20px; }
+        .bienvenida h2 { font-size: 24px; color: var(--text-muted); font-weight: 400; }
+        
+        .fila-msg { display: flex; gap: 15px; width: 100%; max-width: 900px; margin: 0 auto; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .fila-msg.user { justify-content: flex-end; }
-        .avatar-ia { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); }
-        .burbuja { padding: 15px 22px; font-size: 15px; line-height: 1.6; max-width: 80%; }
-        .burbuja.user { background: var(--bubble-user); color: #fff; border-radius: 20px 20px 4px 20px; }
-        .burbuja.ia { background: var(--bubble-ia); color: var(--text-main); padding-top: 5px; }
+        .avatar-ia { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--accent); object-fit: cover; box-shadow: 0 0 10px var(--glow); flex-shrink: 0; }
+        
+        .burbuja { padding: 16px 24px; font-size: 15px; line-height: 1.7; max-width: 80%; letter-spacing: 0.3px; }
+        .burbuja.user { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: #fff; border-radius: 20px 20px 4px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: 500; }
+        .burbuja.ia { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: var(--text-main); border-radius: 4px 20px 20px 20px; backdrop-filter: blur(10px); }
 
+        /* CARGA ANIMADA */
         #zona-carga-segura { display: none; padding: 0 40px 20px; }
-        .indicador-carga { display: flex; gap: 5px; padding: 10px 0; }
-        .punto { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite; }
-        .punto:nth-child(2) { animation-delay: 0.2s; }
-        .punto:nth-child(3) { animation-delay: 0.4s; }
+        .indicador-carga { display: flex; gap: 6px; padding: 10px 0; }
+        .punto { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        .punto:nth-child(1) { animation-delay: -0.32s; }
+        .punto:nth-child(2) { animation-delay: -0.16s; }
 
-        .zona-input { padding: 20px 40px; background: var(--bg-base); display: flex; justify-content: center; }
-        .caja-input { width: 100%; max-width: 900px; display: flex; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 8px 10px 8px 25px; }
+        /* ZONA INPUT */
+        .zona-input { padding: 20px 40px 40px; display: flex; justify-content: center; background: linear-gradient(transparent, var(--bg-deep) 80%); }
+        .caja-input { width: 100%; max-width: 900px; display: flex; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 10px 10px 10px 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: 0.3s; }
+        .caja-input:focus-within { border-color: var(--accent); box-shadow: 0 10px 40px var(--glow); }
         .caja-input input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; }
-        .btn-enviar { background: var(--text-main); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-enviar { background: var(--text-main); color: #000; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-enviar:hover { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 15px var(--glow); }
 
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); box-shadow: 0 0 10px var(--accent); } }
         ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <a href="index.html" class="back-link">← Volver al Inicio</a>
-        <span style="font-weight:bold; color:var(--accent);">FÉXIX CORE</span>
+        <a href="index.html" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Volver a Revolution JPII
+        </a>
+        <span class="brand-title">FÉNIX IA</span>
     </div>
 
     <div id="login-screen">
         <div class="login-box">
             <img src="fenix-logo.jpg" alt="Logo" onerror="this.style.display='none'">
-            <h2>Fénix Core</h2>
-            <p style="color:#888; margin-bottom:20px;">Acceso Estudiantil</p>
+            <h2>Fénix IA</h2>
+            <p>Acceso al Núcleo Cuántico</p>
             <input type="email" id="email-in" class="input-form" placeholder="Correo electrónico">
-            <input type="password" id="pass-in" class="input-form" placeholder="Contraseña">
+            <input type="password" id="pass-in" class="input-form" placeholder="Contraseña secreta">
             <button class="btn-full btn-primary" id="btn-login-mail">Iniciar Sesión</button>
             <button class="btn-full btn-secondary" id="btn-reg-mail">Crear Cuenta</button>
-            <button class="btn-full btn-secondary" id="btn-google" style="margin-top:10px;">Continuar con Google</button>
+            <div style="margin:20px 0; color:#555; font-size:12px;">O INGRESA CON</div>
+            <button class="btn-full btn-secondary" id="btn-google" style="display:flex; justify-content:center; align-items:center; gap:10px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"/></svg>
+                Google
+            </button>
             <div id="error-box" class="error-msg"></div>
         </div>
     </div>
@@ -99,17 +150,28 @@
                 <img id="avatar-ui" src="" alt="U">
                 <div class="user-info">
                     <h4 id="nombre-ui">Usuario</h4>
+                    <span>Estudiante JPII</span>
                 </div>
             </div>
             
-            <button class="btn-nuevo-chat" id="btn-nuevo-chat">+ Nuevo Chat</button>
+            <button class="btn-nuevo-chat" id="btn-nuevo-chat">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Nuevo Chat
+            </button>
             
-            <button class="btn-logout" id="btn-salir">Cerrar Sesión</button>
+            <div class="lista-chats" id="lista-chats">
+                </div>
+
+            <button class="btn-logout" id="btn-salir">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Cerrar Sesión
+            </button>
         </div>
 
         <div class="chat-area">
             <div class="mensajes-container" id="contenedor-mensajes">
                 <div class="bienvenida" id="bienvenida-msg">
+                    <img src="fenix-logo.jpg" alt="Fenix" onerror="this.style.display='none'">
                     <h2>¿Qué analizaremos hoy?</h2>
                 </div>
             </div>
@@ -123,8 +185,10 @@
 
             <div class="zona-input">
                 <div class="caja-input">
-                    <input type="text" id="input-chat" placeholder="Conéctate con el núcleo Fénix..." autocomplete="off">
-                    <button class="btn-enviar" id="btn-enviar">➤</button>
+                    <input type="text" id="input-chat" placeholder="Escribe tu mensaje para Fénix IA..." autocomplete="off">
+                    <button class="btn-enviar" id="btn-enviar">
+                        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path></svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -133,7 +197,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        // IMPORTANTE: Añadí doc, updateDoc para organizar los chats
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA4mHFTQAbqLNNEfAMitv1joJ7iYdVs18I",
@@ -147,7 +212,10 @@
         const provider = new GoogleAuthProvider();
 
         let userActual = null;
-        let unsubscribe = null; 
+        let chatActualId = null; // Para saber en qué chat estamos escribiendo
+        let unsubscribeMensajes = null; 
+        let unsubscribeLista = null;
+
         const RUTA_LOGO = "fenix-logo.jpg";
         const URL_RENDER = "https://fenix-backend-uqbg.onrender.com/api/chat";
 
@@ -155,6 +223,7 @@
             login: document.getElementById('login-screen'),
             app: document.getElementById('chat-app'),
             error: document.getElementById('error-box'),
+            listaChats: document.getElementById('lista-chats'),
             mensajes: document.getElementById('contenedor-mensajes'),
             input: document.getElementById('input-chat'),
             bienvenida: document.getElementById('bienvenida-msg'),
@@ -163,6 +232,7 @@
 
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
 
+        // AUTH
         document.getElementById('btn-google').addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando."); }});
         document.getElementById('btn-login-mail').addEventListener('click', async () => { try { await signInWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Error de credenciales."); }});
         document.getElementById('btn-reg-mail').addEventListener('click', async () => { try { await createUserWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); } catch(e) { showError("Error al crear cuenta."); }});
@@ -178,31 +248,80 @@
                 document.getElementById('nombre-ui').innerText = nombre;
                 document.getElementById('avatar-ui').src = user.photoURL || `https://ui-avatars.com/api/?name=${nombre}&background=00e5ff&color=000&bold=true`;
                 
-                iniciarChat();
+                cargarHistorialDeChats();
             } else {
                 userActual = null;
+                chatActualId = null;
                 DOM.app.style.display = 'none';
                 DOM.login.style.display = 'flex';
-                if(unsubscribe) unsubscribe();
+                if(unsubscribeMensajes) unsubscribeMensajes();
+                if(unsubscribeLista) unsubscribeLista();
             }
         });
 
-        // NUEVO CHAT (Limpia la pantalla)
-        document.getElementById('btn-nuevo-chat').addEventListener('click', () => {
-            DOM.mensajes.innerHTML = '';
-            DOM.mensajes.appendChild(DOM.bienvenida);
-            DOM.bienvenida.style.display = 'block';
-            
-            // Si quieres que el nuevo chat NO guarde en el historial viejo, tendrías que cambiar de colección
-            // Pero por ahora, solo limpiamos la pantalla para dar espacio fresco.
-            if(unsubscribe) unsubscribe(); 
-        });
-
-        function iniciarChat() {
+        // 1. CARGAR EL MENÚ LATERAL (Chat 1, Chat 2...)
+        function cargarHistorialDeChats() {
             if (!userActual) return;
-            const q = query(collection(db, `chats_${userActual.uid}`), orderBy("timestamp", "asc"));
+            const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
+            const q = query(refChats, orderBy("actualizado", "desc"));
             
-            unsubscribe = onSnapshot(q, (snapshot) => {
+            unsubscribeLista = onSnapshot(q, (snapshot) => {
+                DOM.listaChats.innerHTML = '';
+                
+                if(snapshot.empty && !chatActualId) {
+                    crearNuevoChat("Chat 1");
+                    return;
+                }
+
+                let esElPrimero = true;
+                snapshot.forEach((documento) => {
+                    const data = documento.data();
+                    const div = document.createElement('div');
+                    div.className = `chat-item ${documento.id === chatActualId ? 'active' : ''}`;
+                    div.innerText = data.titulo || "Chat";
+                    
+                    div.onclick = () => abrirChat(documento.id);
+                    DOM.listaChats.appendChild(div);
+
+                    // Si entramos por primera vez, abrir el chat más reciente automáticamente
+                    if(esElPrimero && !chatActualId) {
+                        abrirChat(documento.id);
+                    }
+                    esElPrimero = false;
+                });
+            });
+        }
+
+        // 2. CREAR UN NUEVO CHAT EN LA BASE DE DATOS
+        async function crearNuevoChat(nombreOpcional) {
+            if (!userActual) return;
+            const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
+            const numChats = document.querySelectorAll('.chat-item').length + 1;
+            const tituloNuevo = nombreOpcional || `Chat ${numChats}`;
+            
+            const nuevoDoc = await addDoc(refChats, { 
+                titulo: tituloNuevo, 
+                actualizado: serverTimestamp() 
+            });
+            abrirChat(nuevoDoc.id);
+        }
+
+        document.getElementById('btn-nuevo-chat').addEventListener('click', () => crearNuevoChat());
+
+        // 3. ABRIR UN CHAT ESPECÍFICO Y LEER SUS MENSAJES
+        function abrirChat(idChat) {
+            chatActualId = idChat;
+            
+            // Remarcar el activo en la UI
+            document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+            // Refrescar el listener de la lista hará el active automático, pero por velocidad visual lo hacemos manual
+            
+            if(unsubscribeMensajes) unsubscribeMensajes();
+            
+            const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
+            const q = query(refMensajes, orderBy("timestamp", "asc"));
+            
+            unsubscribeMensajes = onSnapshot(q, (snapshot) => {
                 DOM.mensajes.innerHTML = ''; 
                 if(snapshot.empty) {
                     DOM.mensajes.appendChild(DOM.bienvenida);
@@ -214,14 +333,20 @@
             });
         }
 
+        // 4. ENVIAR MENSAJE
         async function enviarMsg() {
             const texto = DOM.input.value.trim();
-            if (texto === "" || !userActual) return;
+            if (texto === "" || !userActual || !chatActualId) return;
             DOM.input.value = "";
             
-            const refChat = collection(db, `chats_${userActual.uid}`);
+            const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
+            const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
             
-            try { await addDoc(refChat, { texto: texto, emisor: "user", timestamp: serverTimestamp() }); } catch(e) { return; }
+            // Guardar usuario y actualizar fecha del chat para que suba en la lista
+            try { 
+                await addDoc(refMensajes, { texto: texto, emisor: "user", timestamp: serverTimestamp() }); 
+                await updateDoc(refChatPrincipal, { actualizado: serverTimestamp() });
+            } catch(e) { return; }
             
             DOM.carga.style.display = 'block';
             scrollAbajo();
@@ -233,13 +358,13 @@
                 DOM.carga.style.display = 'none';
                 
                 if(data.respuesta) {
-                    await addDoc(refChat, { texto: data.respuesta, emisor: "ia", timestamp: serverTimestamp() });
+                    await addDoc(refMensajes, { texto: data.respuesta, emisor: "ia", timestamp: serverTimestamp() });
                 } else if(data.error) {
-                    await addDoc(refChat, { texto: "⚠️ " + data.error, emisor: "ia", timestamp: serverTimestamp() });
+                    await addDoc(refMensajes, { texto: "⚠️ " + data.error, emisor: "ia", timestamp: serverTimestamp() });
                 }
             } catch (error) {
                 DOM.carga.style.display = 'none';
-                await addDoc(refChat, { texto: "🔌 Error de conexión.", emisor: "ia", timestamp: serverTimestamp() });
+                await addDoc(refMensajes, { texto: "🔌 Error de conexión.", emisor: "ia", timestamp: serverTimestamp() });
             }
         }
 
