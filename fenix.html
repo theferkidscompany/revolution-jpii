@@ -19,21 +19,22 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: radial-gradient(circle at top right, #0a1128 0%, var(--bg-deep) 100%); color: var(--text-main); overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER */
-        .top-bar { padding: 15px 30px; background: rgba(3, 3, 5, 0.5); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 229, 255, 0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        /* HEADER & TOP BAR */
+        .top-bar { padding: 15px 30px; background: rgba(3, 3, 5, 0.5); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 229, 255, 0.1); display: flex; justify-content: space-between; align-items: center; z-index: 300; position: relative;}
+        .top-bar-left { display: flex; align-items: center; gap: 15px; }
+        .btn-menu-mobile { display: none; background: transparent; border: none; color: var(--accent); font-size: 24px; cursor: pointer; padding: 5px; }
         .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
         .back-link:hover { color: var(--accent); transform: translateX(-5px); }
         .brand-title { font-weight: 900; color: var(--accent); letter-spacing: 2px; text-shadow: 0 0 10px var(--glow); }
 
-        /* ================= AUTHENTICATION (ARTE) ================= */
+        /* ================= AUTHENTICATION (LOGIN/REGISTRO) ================= */
         #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center; z-index: 500; background: var(--bg-deep); }
-        .login-box { background: var(--bg-glass); backdrop-filter: blur(25px); padding: 40px; border-radius: 24px; width: 100%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 60px rgba(0,0,0,0.8); overflow: hidden; position: relative;}
+        .login-box { background: var(--bg-glass); backdrop-filter: blur(25px); padding: 40px; border-radius: 24px; width: 90%; max-width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 20px 60px rgba(0,0,0,0.8); overflow: hidden; position: relative;}
         
         .login-header img { width: 80px; height: 80px; object-fit: cover; border-radius: 20px; margin-bottom: 15px; border: 2px solid var(--accent); box-shadow: 0 0 20px var(--glow); }
         .login-header h2 { font-size: 26px; margin-bottom: 5px; font-weight: 800; }
         .login-header p { color: var(--text-muted); margin-bottom: 25px; font-size: 13px; }
 
-        /* TABS DE NAVEGACIÓN (LOGIN / REGISTRO) */
         .auth-tabs { display: flex; background: rgba(0,0,0,0.4); border-radius: 12px; margin-bottom: 25px; padding: 5px; }
         .tab-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; background: transparent; color: var(--text-muted); font-weight: bold; cursor: pointer; transition: 0.3s; }
         .tab-btn.active { background: rgba(255,255,255,0.1); color: var(--accent); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -56,15 +57,16 @@
 
         .error-msg { color: var(--danger); font-size: 13px; display: none; margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(255, 68, 68, 0.3); }
         
-        /* PANTALLA DE ÉXITO DE CORREO */
         #verify-screen { display: none; flex-direction: column; align-items: center; animation: fadeIn 0.5s; padding: 20px 0; }
         .mail-icon { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--glow)); }
 
         /* ================= INTERFAZ DEL CHAT ================= */
-        #chat-app { display: none; width: 100%; height: calc(100vh - 56px); flex-direction: row; }
+        #chat-app { display: none; width: 100%; height: calc(100vh - 61px); flex-direction: row; position: relative;}
         
         /* SIDEBAR & HISTORIAL */
-        .sidebar { width: 320px; background: var(--bg-glass); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; padding: 25px 20px; }
+        .sidebar { width: 320px; background: var(--bg-glass); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; padding: 25px 20px; transition: transform 0.3s ease; z-index: 200;}
+        .sidebar-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 150; backdrop-filter: blur(2px); }
+
         .user-card { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.1); border-radius: 15px; margin-bottom: 25px; }
         .user-card img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
         .user-info h4 { font-size: 15px; margin-bottom: 2px; }
@@ -75,7 +77,6 @@
 
         .lista-chats { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-right: 5px; }
         
-        /* DISEÑO DE CHAT ITEMS (Con botones mágicos) */
         .chat-item { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-size: 14px; transition: 0.2s; border-left: 3px solid transparent; background: transparent; }
         .chat-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
         .chat-item.active { background: rgba(0, 229, 255, 0.1); color: var(--text-main); border-left-color: var(--accent); font-weight: 600; box-shadow: inset 20px 0 30px rgba(0, 229, 255, 0.05); }
@@ -92,34 +93,44 @@
         .btn-logout:hover { color: var(--danger); background: rgba(255, 77, 77, 0.1); }
 
         /* AREA CHAT CENTRAL */
-        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, rgba(0,229,255,0.02) 0%, transparent 70%); }
-        .mensajes-container { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; gap: 30px; scroll-behavior: smooth; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; background: radial-gradient(circle at center, rgba(0,229,255,0.02) 0%, transparent 70%); width: 100%;}
+        .mensajes-container { flex: 1; overflow-y: auto; padding: 30px 40px; display: flex; flex-direction: column; gap: 25px; scroll-behavior: smooth; }
         
-        .bienvenida { text-align: center; margin: auto; animation: fadeIn 1s; }
+        .bienvenida { text-align: center; margin: auto; animation: fadeIn 1s; padding: 20px;}
         .bienvenida img { width: 120px; height: 120px; border-radius: 30px; filter: grayscale(100%) opacity(0.3); margin-bottom: 20px; }
-        .bienvenida h2 { font-size: 24px; color: var(--text-muted); font-weight: 400; }
+        .bienvenida h2 { font-size: 22px; color: var(--text-muted); font-weight: 400; line-height: 1.4;}
         
         .fila-msg { display: flex; gap: 15px; width: 100%; max-width: 900px; margin: 0 auto; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .fila-msg.user { justify-content: flex-end; }
         .avatar-ia { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--accent); object-fit: cover; box-shadow: 0 0 10px var(--glow); flex-shrink: 0; }
         
-        .burbuja { padding: 16px 24px; font-size: 15px; line-height: 1.7; max-width: 80%; letter-spacing: 0.3px; }
+        .burbuja { padding: 14px 20px; font-size: 15px; line-height: 1.6; max-width: 85%; letter-spacing: 0.3px; word-wrap: break-word;}
         .burbuja.user { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: #fff; border-radius: 20px 20px 4px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: 500; }
         .burbuja.ia { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: var(--text-main); border-radius: 4px 20px 20px 20px; backdrop-filter: blur(10px); }
+        
+        .adjunto-badge { display: block; font-size: 11px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; margin-bottom: 8px; width: fit-content; border: 1px solid rgba(255,255,255,0.2);}
 
         /* CARGA ANIMADA */
-        #zona-carga-segura { display: none; padding: 0 40px 20px; }
-        .indicador-carga { display: flex; gap: 6px; padding: 10px 0; }
+        #zona-carga-segura { display: none; padding: 0 40px 15px; }
+        .indicador-carga { display: flex; gap: 6px; padding: 8px 0; }
         .punto { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
         .punto:nth-child(1) { animation-delay: -0.32s; }
         .punto:nth-child(2) { animation-delay: -0.16s; }
 
-        /* ZONA INPUT */
-        .zona-input { padding: 20px 40px 40px; display: flex; justify-content: center; background: linear-gradient(transparent, var(--bg-deep) 80%); }
-        .caja-input { width: 100%; max-width: 900px; display: flex; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 10px 10px 10px 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: 0.3s; }
+        /* ZONA INPUT CON ADJUNTOS */
+        .zona-input { padding: 15px 30px 30px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(transparent, var(--bg-deep) 80%); width: 100%;}
+        
+        .preview-archivo { display: none; background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent); padding: 6px 15px; border-radius: 20px; color: var(--accent); font-size: 12px; margin-bottom: 10px; align-items: center; justify-content: space-between; width: 100%; max-width: 900px; animation: slideUp 0.3s ease;}
+        .btn-quitar-archivo { background: transparent; border: none; color: #ff4444; cursor: pointer; font-weight: bold; font-size: 14px; padding: 0 5px;}
+
+        .caja-input { width: 100%; max-width: 900px; display: flex; background: rgba(10,10,15,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 8px 10px 8px 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: 0.3s; align-items: center; gap: 8px;}
         .caja-input:focus-within { border-color: var(--accent); box-shadow: 0 10px 40px var(--glow); }
-        .caja-input input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; }
-        .btn-enviar { background: var(--text-main); color: #000; border: none; width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .caja-input input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; width: 100%;}
+        
+        .btn-adjuntar { background: transparent; color: var(--text-muted); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 5px;}
+        .btn-adjuntar:hover { color: var(--accent); transform: scale(1.1); }
+        
+        .btn-enviar { background: var(--text-main); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0;}
         .btn-enviar:hover { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 15px var(--glow); }
 
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -128,21 +139,36 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        /* ================= OPTIMIZACIÓN MÓVIL ================= */
+        @media (max-width: 768px) {
+            .btn-menu-mobile { display: block; }
+            .top-bar { padding: 15px 20px; }
+            .sidebar { position: absolute; left: -100%; height: 100%; background: rgba(10, 10, 15, 0.95); box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
+            .sidebar.open { left: 0; transform: translateX(0); }
+            .chat-actions { opacity: 1; } /* En móvil siempre visibles */
+            .mensajes-container { padding: 20px 15px; gap: 20px;}
+            .burbuja { font-size: 14px; padding: 12px 16px; max-width: 90%;}
+            .zona-input { padding: 10px 15px 20px; }
+            #zona-carga-segura { padding: 0 15px 10px; }
+        }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
-        <a href="index.html" class="back-link">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            Volver a Revolution JPII
-        </a>
+        <div class="top-bar-left">
+            <button class="btn-menu-mobile" id="btn-menu-mobile">☰</button>
+            <a href="index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span class="back-text">Inicio</span>
+            </a>
+        </div>
         <span class="brand-title">FÉNIX IA</span>
     </div>
 
     <div id="login-screen">
         <div class="login-box">
-            
             <div id="auth-forms-container">
                 <div class="login-header">
                     <img src="fenix-logo.jpg" alt="Logo" onerror="this.style.display='none'">
@@ -159,19 +185,14 @@
                     <input type="email" id="email-in" class="input-form" placeholder="Correo electrónico">
                     <input type="password" id="pass-in" class="input-form" placeholder="Contraseña">
                     <button class="btn-full btn-primary" id="btn-login-mail">Iniciar Sesión</button>
-                    
-                    <div class="divider">
-                        <span class="line"></span><span class="text">O INGRESA CON</span><span class="line"></span>
-                    </div>
-                    
+                    <div class="divider"><span class="line"></span><span class="text">O INGRESA CON</span><span class="line"></span></div>
                     <button class="btn-full btn-secondary" id="btn-google">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20px" height="20px">
                             <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
                             <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
                             <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
                             <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-                        </svg>
-                        Google
+                        </svg> Google
                     </button>
                 </div>
 
@@ -179,24 +200,23 @@
                     <input type="email" id="email-reg" class="input-form" placeholder="Correo electrónico">
                     <input type="password" id="pass-reg" class="input-form" placeholder="Crea una contraseña (Mín. 6)">
                     <button class="btn-full btn-primary" id="btn-reg-mail">Registrarme</button>
-                    <p style="font-size: 11px; color:#666; margin-top:10px;">Enviaremos un correo para verificar tu humanidad.</p>
+                    <p style="font-size: 11px; color:#666; margin-top:10px;">Enviaremos un correo de verificación.</p>
                 </div>
-                
                 <div id="error-box" class="error-msg"></div>
             </div>
 
             <div id="verify-screen">
                 <div class="mail-icon">📩</div>
                 <h2 style="margin-bottom: 10px;">¡Cuenta Creada!</h2>
-                <p style="color:var(--text-muted); font-size:14px; line-height:1.5;">Hemos enviado un enlace de verificación a tu correo. <br><br>Por favor, ábrelo para activar tu cuenta. Luego, recarga esta página e inicia sesión.</p>
+                <p style="color:var(--text-muted); font-size:14px; line-height:1.5;">Revisa tu correo para activar la cuenta. Luego recarga esta página e inicia sesión.</p>
                 <button class="btn-full btn-secondary" style="margin-top:20px;" onclick="location.reload()">Volver al Login</button>
             </div>
-
         </div>
     </div>
 
     <div id="chat-app">
-        <div class="sidebar">
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="sidebar" id="sidebar">
             <div class="user-card">
                 <img id="avatar-ui" src="" alt="U">
                 <div class="user-info">
@@ -222,7 +242,7 @@
             <div class="mensajes-container" id="contenedor-mensajes">
                 <div class="bienvenida" id="bienvenida-msg">
                     <img src="fenix-logo.jpg" alt="Fenix" onerror="this.style.display='none'">
-                    <h2>Hola, soy Fénix. ¿Listo para la Revolución?</h2>
+                    <h2 id="texto-bienvenida">Hola, soy Fénix. ¿Listo para la Revolución?</h2>
                 </div>
             </div>
 
@@ -234,8 +254,19 @@
             </div>
 
             <div class="zona-input">
+                <div class="preview-archivo" id="preview-archivo">
+                    <span id="texto-archivo">imagen.png</span>
+                    <button class="btn-quitar-archivo" id="btn-quitar-archivo" title="Quitar archivo">✕</button>
+                </div>
+
                 <div class="caja-input">
-                    <input type="text" id="input-chat" placeholder="Escribe tu mensaje para Fénix IA..." autocomplete="off">
+                    <input type="file" id="file-upload" accept="image/*,.pdf,.txt" style="display: none;">
+                    <button class="btn-adjuntar" id="btn-adjuntar" title="Adjuntar Imagen o Documento">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    </button>
+
+                    <input type="text" id="input-chat" placeholder="Escribe o sube una imagen..." autocomplete="off">
+                    
                     <button class="btn-enviar" id="btn-enviar">
                         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path></svg>
                     </button>
@@ -247,7 +278,6 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        // IMPORTACIONES CRÍTICAS AÑADIDAS (deleteDoc, updateDoc, doc)
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -265,9 +295,21 @@
         let chatActualId = null; 
         let unsubscribeMensajes = null; 
         let unsubscribeLista = null;
+        
+        let archivoActualB64 = null;
+        let mimeTypeActual = null;
 
         const RUTA_LOGO = "fenix-logo.jpg";
         const URL_RENDER = "https://fenix-backend-uqbg.onrender.com/api/chat";
+
+        // FRASES DINÁMICAS
+        const frasesBienvenida = [
+            "Hola campeón, soy Fénix. ¿Listo para la Revolución?",
+            "¡Qué onda varón! ¿En qué te ayudo hoy?",
+            "La Revolución acaba de comenzar. ¿Qué analizamos?",
+            "Fénix en línea. ¿Listo para cambiar al mundo?",
+            "¡Compañero! Aquí Fénix. ¿Qué dudas tienes hoy?"
+        ];
 
         const DOM = {
             login: document.getElementById('login-screen'),
@@ -283,12 +325,20 @@
             mensajes: document.getElementById('contenedor-mensajes'),
             input: document.getElementById('input-chat'),
             bienvenida: document.getElementById('bienvenida-msg'),
-            carga: document.getElementById('zona-carga-segura')
+            textoBienvenida: document.getElementById('texto-bienvenida'),
+            carga: document.getElementById('zona-carga-segura'),
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('sidebar-overlay'),
+            btnMenu: document.getElementById('btn-menu-mobile')
         };
 
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
 
-        // === CONTROL DE PESTAÑAS LOGIN/REGISTRO ===
+        // === MENÚ MÓVIL ===
+        DOM.btnMenu.addEventListener('click', () => { DOM.sidebar.classList.add('open'); DOM.overlay.style.display = 'block'; });
+        DOM.overlay.addEventListener('click', () => { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; });
+
+        // === PESTAÑAS AUTH ===
         DOM.tabLogin.addEventListener('click', () => {
             DOM.tabLogin.classList.add('active'); DOM.tabReg.classList.remove('active');
             DOM.formLogin.classList.add('active'); DOM.formReg.classList.remove('active');
@@ -300,60 +350,46 @@
             DOM.error.style.display = 'none';
         });
 
-        // ================= AUTHENTICATION LOGIC =================
-        document.getElementById('btn-google').addEventListener('click', async () => { 
-            try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando con Google."); }
-        });
-
+        // === AUTH LÓGICA ===
+        document.getElementById('btn-google').addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando con Google."); }});
         document.getElementById('btn-login-mail').addEventListener('click', async () => { 
             try { 
                 const cred = await signInWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); 
-                if (!cred.user.emailVerified) {
-                    showError("⚠️ Cuenta NO Verificada. Revisa tu correo (o carpeta SPAM) y haz clic en el enlace.");
-                    await signOut(auth);
-                }
+                if (!cred.user.emailVerified) { showError("⚠️ Cuenta NO Verificada."); await signOut(auth); }
             } catch(e) { showError("Correo o contraseña incorrectos."); }
         });
-
         document.getElementById('btn-reg-mail').addEventListener('click', async () => { 
             try { 
                 const cred = await createUserWithEmailAndPassword(auth, document.getElementById('email-reg').value, document.getElementById('pass-reg').value); 
                 await sendEmailVerification(cred.user);
-                
-                // Magia Visual: Mostrar pantalla de Éxito
-                DOM.authContainer.style.display = 'none';
-                DOM.verifyScreen.style.display = 'flex';
-                
+                DOM.authContainer.style.display = 'none'; DOM.verifyScreen.style.display = 'flex';
                 await signOut(auth);
-            } catch(e) { showError("Error: Correo inválido, ya registrado o contraseña muy corta."); }
+            } catch(e) { showError("Error: Correo inválido, registrado o contraseña muy corta."); }
         });
-
         document.getElementById('btn-salir').addEventListener('click', () => signOut(auth));
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 if(user.providerData[0].providerId === 'password' && !user.emailVerified) return;
-
                 userActual = user;
-                DOM.login.style.display = 'none';
-                DOM.app.style.display = 'flex';
-                
+                DOM.login.style.display = 'none'; DOM.app.style.display = 'flex';
                 const nombre = user.displayName || user.email.split('@')[0];
                 document.getElementById('nombre-ui').innerText = nombre;
                 document.getElementById('avatar-ui').src = user.photoURL || `https://ui-avatars.com/api/?name=${nombre}&background=00e5ff&color=000&bold=true`;
-                
                 cargarHistorialDeChats();
             } else {
-                userActual = null;
-                chatActualId = null;
-                DOM.app.style.display = 'none';
-                DOM.login.style.display = 'flex';
+                userActual = null; chatActualId = null;
+                DOM.app.style.display = 'none'; DOM.login.style.display = 'flex';
                 if(unsubscribeMensajes) unsubscribeMensajes();
                 if(unsubscribeLista) unsubscribeLista();
             }
         });
 
-        // ================= GESTOR DE CHATS (CON RENOMBRAR/BORRAR) =================
+        // === GESTOR CHATS ===
+        function setFraseBienvenida() {
+            DOM.textoBienvenida.innerText = frasesBienvenida[Math.floor(Math.random() * frasesBienvenida.length)];
+        }
+
         function cargarHistorialDeChats() {
             if (!userActual) return;
             const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
@@ -361,7 +397,6 @@
             
             unsubscribeLista = onSnapshot(q, (snapshot) => {
                 DOM.listaChats.innerHTML = '';
-                
                 if(snapshot.empty && !chatActualId) { crearNuevoChat("Chat 1"); return; }
 
                 let esElPrimero = true;
@@ -372,49 +407,36 @@
                     const div = document.createElement('div');
                     div.className = `chat-item ${idDoc === chatActualId ? 'active' : ''}`;
                     
-                    // Título Clickable
                     const spanTitulo = document.createElement('span');
                     spanTitulo.className = 'chat-title';
                     spanTitulo.innerText = data.titulo || "Chat";
                     spanTitulo.onclick = () => abrirChat(idDoc);
 
-                    // Botones de acción Mágicos
                     const divActions = document.createElement('div');
                     divActions.className = 'chat-actions';
                     
                     const btnEdit = document.createElement('button');
                     btnEdit.className = 'btn-icon edit';
                     btnEdit.innerHTML = '✏️';
-                    btnEdit.title = "Renombrar";
                     btnEdit.onclick = async (e) => {
                         e.stopPropagation(); 
-                        const nuevoNombre = prompt("Nuevo nombre para el chat:", data.titulo);
-                        if(nuevoNombre && nuevoNombre.trim() !== "") {
-                            await updateDoc(doc(db, `usuarios/${userActual.uid}/mis_chats/${idDoc}`), { titulo: nuevoNombre });
-                        }
+                        const nuevoNombre = prompt("Nuevo nombre:", data.titulo);
+                        if(nuevoNombre && nuevoNombre.trim() !== "") await updateDoc(doc(db, `usuarios/${userActual.uid}/mis_chats/${idDoc}`), { titulo: nuevoNombre });
                     };
 
                     const btnDelete = document.createElement('button');
                     btnDelete.className = 'btn-icon delete';
                     btnDelete.innerHTML = '🗑️';
-                    btnDelete.title = "Borrar";
                     btnDelete.onclick = async (e) => {
                         e.stopPropagation();
-                        if(confirm("¿Seguro que quieres borrar este chat histórico?")) {
+                        if(confirm("¿Borrar chat?")) {
                             await deleteDoc(doc(db, `usuarios/${userActual.uid}/mis_chats/${idDoc}`));
-                            if(chatActualId === idDoc) { 
-                                chatActualId = null; 
-                                DOM.mensajes.innerHTML = ''; 
-                                DOM.mensajes.appendChild(DOM.bienvenida);
-                                DOM.bienvenida.style.display = 'block';
-                            }
+                            if(chatActualId === idDoc) { chatActualId = null; setFraseBienvenida(); DOM.mensajes.innerHTML = ''; DOM.mensajes.appendChild(DOM.bienvenida); DOM.bienvenida.style.display = 'block'; }
                         }
                     };
 
-                    divActions.appendChild(btnEdit);
-                    divActions.appendChild(btnDelete);
-                    div.appendChild(spanTitulo);
-                    div.appendChild(divActions);
+                    divActions.appendChild(btnEdit); divActions.appendChild(btnDelete);
+                    div.appendChild(spanTitulo); div.appendChild(divActions);
                     DOM.listaChats.appendChild(div);
 
                     if(esElPrimero && !chatActualId) { abrirChat(idDoc); }
@@ -423,30 +445,29 @@
             });
         }
 
-        async function crearNuevoChat(nombreOpcional) {
+        async function crearNuevoChat() {
             if (!userActual) return;
             const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
-            const numChats = document.querySelectorAll('.chat-item').length + 1;
-            const tituloNuevo = nombreOpcional || `Chat ${numChats}`;
-            
+            const tituloNuevo = `Chat ${document.querySelectorAll('.chat-item').length + 1}`;
             const nuevoDoc = await addDoc(refChats, { titulo: tituloNuevo, actualizado: serverTimestamp() });
             abrirChat(nuevoDoc.id);
         }
-
-        document.getElementById('btn-nuevo-chat').addEventListener('click', () => crearNuevoChat());
+        document.getElementById('btn-nuevo-chat').addEventListener('click', crearNuevoChat);
 
         function abrirChat(idChat) {
             chatActualId = idChat;
             document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
+            // Ocultar menú en móviles al seleccionar
+            if(window.innerWidth <= 768) { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; }
             
             if(unsubscribeMensajes) unsubscribeMensajes();
-            
             const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
             const q = query(refMensajes, orderBy("timestamp", "asc"));
             
             unsubscribeMensajes = onSnapshot(q, (snapshot) => {
                 DOM.mensajes.innerHTML = ''; 
                 if(snapshot.empty) {
+                    setFraseBienvenida();
                     DOM.mensajes.appendChild(DOM.bienvenida);
                     DOM.bienvenida.style.display = 'block';
                 } else {
@@ -456,36 +477,65 @@
             });
         }
 
+        // === LOGICA DE ADJUNTOS ===
+        document.getElementById('btn-adjuntar').addEventListener('click', () => document.getElementById('file-upload').click());
+        document.getElementById('file-upload').addEventListener('change', function() {
+            const file = this.files[0];
+            if(!file) return;
+            if(file.size > 5 * 1024 * 1024) { alert("El archivo es muy pesado (Máx 5MB)."); return; }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                archivoActualB64 = e.target.result;
+                mimeTypeActual = file.type;
+                document.getElementById('texto-archivo').innerText = "📎 " + file.name;
+                document.getElementById('preview-archivo').style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        document.getElementById('btn-quitar-archivo').addEventListener('click', () => {
+            archivoActualB64 = null; mimeTypeActual = null;
+            document.getElementById('file-upload').value = '';
+            document.getElementById('preview-archivo').style.display = 'none';
+        });
+
+        // === ENVIAR MENSAJE ===
         async function enviarMsg() {
             const texto = DOM.input.value.trim();
-            if (texto === "" || !userActual || !chatActualId) return;
+            if (texto === "" && !archivoActualB64) return;
             DOM.input.value = "";
             
             const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
             const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
             
+            let textoVisible = texto;
+            if(archivoActualB64) textoVisible = `<span class="adjunto-badge">📎 Archivo Adjunto</span>` + textoVisible;
+
             try { 
-                await addDoc(refMensajes, { texto: texto, emisor: "user", timestamp: serverTimestamp() }); 
+                await addDoc(refMensajes, { texto: textoVisible, emisor: "user", timestamp: serverTimestamp() }); 
                 await updateDoc(refChatPrincipal, { actualizado: serverTimestamp() });
             } catch(e) { return; }
-            
+
+            const payload = { mensaje: texto || "¿Qué hay en este archivo?" };
+            if(archivoActualB64) {
+                payload.archivoBase64 = archivoActualB64; payload.mimeType = mimeTypeActual;
+                document.getElementById('btn-quitar-archivo').click();
+            }
+
             DOM.carga.style.display = 'block';
             scrollAbajo();
 
             try {
-                const res = await fetch(URL_RENDER, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mensaje: texto }) });
+                const res = await fetch(URL_RENDER, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                 const data = await res.json();
-                
                 DOM.carga.style.display = 'none';
                 
-                if(data.respuesta) {
-                    await addDoc(refMensajes, { texto: data.respuesta, emisor: "ia", timestamp: serverTimestamp() });
-                } else if(data.error) {
-                    await addDoc(refMensajes, { texto: "⚠️ " + data.error, emisor: "ia", timestamp: serverTimestamp() });
-                }
+                if(data.respuesta) await addDoc(refMensajes, { texto: data.respuesta, emisor: "ia", timestamp: serverTimestamp() });
+                else if(data.error) await addDoc(refMensajes, { texto: "⚠️ " + data.error, emisor: "ia", timestamp: serverTimestamp() });
             } catch (error) {
                 DOM.carga.style.display = 'none';
-                await addDoc(refMensajes, { texto: "🔌 Error de conexión. Intenta de nuevo.", emisor: "ia", timestamp: serverTimestamp() });
+                await addDoc(refMensajes, { texto: "🔌 Error cuántico. Intenta de nuevo.", emisor: "ia", timestamp: serverTimestamp() });
             }
         }
 
@@ -495,8 +545,7 @@
                 <div class="fila-msg ${esUser ? 'user' : 'ia'}">
                     ${!esUser ? `<img src="${RUTA_LOGO}" class="avatar-ia" onerror="this.style.display='none'">` : ''}
                     <div class="burbuja ${esUser ? 'user' : 'ia'}">${texto.replace(/\n/g, '<br>')}</div>
-                </div>
-            `;
+                </div>`;
             DOM.mensajes.insertAdjacentHTML('beforeend', html);
         }
 
