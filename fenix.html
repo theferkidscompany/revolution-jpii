@@ -539,13 +539,30 @@
             }
         }
 
+        function formatearTextoIA(texto) {
+            let html = texto;
+            // Traduce negritas (**texto**)
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Traduce cursivas (*texto*)
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            // Traduce bloques de código o matemáticas simples (`texto`)
+            html = html.replace(/`(.*?)`/g, '<code style="background:rgba(0,229,255,0.1); padding:2px 5px; border-radius:4px; color:var(--accent);">$1</code>');
+            // Convierte los saltos de línea en <br>
+            html = html.replace(/\n/g, '<br>');
+            return html;
+        }
+
         function renderizarMensaje(texto, emisor) {
             const esUser = emisor === "user";
+            
+            const textoFinal = esUser ? texto.replace(/\n/g, '<br>') : formatearTextoIA(texto);
+
             const html = `
                 <div class="fila-msg ${esUser ? 'user' : 'ia'}">
                     ${!esUser ? `<img src="${RUTA_LOGO}" class="avatar-ia" onerror="this.style.display='none'">` : ''}
-                    <div class="burbuja ${esUser ? 'user' : 'ia'}">${texto.replace(/\n/g, '<br>')}</div>
-                </div>`;
+                    <div class="burbuja ${esUser ? 'user' : 'ia'}">${textoFinal}</div>
+                </div>
+            `;
             DOM.mensajes.insertAdjacentHTML('beforeend', html);
         }
 
