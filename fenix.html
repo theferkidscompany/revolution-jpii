@@ -18,7 +18,6 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
         
-        /* MAGIA MÓVIL: 100dvh se adapta si sale el teclado o la barra del navegador */
         body { 
             background: radial-gradient(circle at top right, #0a1128 0%, var(--bg-deep) 100%); 
             color: var(--text-main); 
@@ -86,7 +85,6 @@
         .divider { display: flex; align-items: center; justify-content: center; margin: 20px 0; }
         .divider span.line { height: 1px; background: rgba(255,255,255,0.1); flex: 1; }
         .divider span.text { color: #555; font-size: 11px; margin: 0 10px; letter-spacing: 1px; }
-
         .error-msg { color: var(--danger); font-size: 13px; display: none; margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(255, 68, 68, 0.3); }
         
         #verify-screen { display: none; flex-direction: column; align-items: center; animation: fadeIn 0.5s; padding: 20px 0; }
@@ -108,7 +106,6 @@
         .btn-nuevo-chat:hover { background: rgba(0, 229, 255, 0.1); box-shadow: 0 0 15px var(--glow); }
 
         .lista-chats { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; padding-right: 5px; }
-        
         .chat-item { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-radius: 10px; cursor: pointer; color: var(--text-muted); font-size: 14px; transition: 0.2s; border-left: 3px solid transparent; background: transparent; }
         .chat-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
         .chat-item.active { background: rgba(0, 229, 255, 0.1); color: var(--text-main); border-left-color: var(--accent); font-weight: 600; box-shadow: inset 20px 0 30px rgba(0, 229, 255, 0.05); }
@@ -139,12 +136,12 @@
         .burbuja { padding: 14px 20px; font-size: 15px; line-height: 1.6; max-width: 85%; letter-spacing: 0.3px; word-wrap: break-word;}
         .burbuja.user { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: #fff; border-radius: 20px 20px 4px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: 500; }
         .burbuja.ia { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: var(--text-main); border-radius: 4px 20px 20px 20px; backdrop-filter: blur(10px); }
+        .burbuja.sistema { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); color: #ffcccc; font-style: italic;}
         
         .adjunto-badge { display: block; font-size: 11px; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 10px; margin-bottom: 8px; width: fit-content; border: 1px solid rgba(255,255,255,0.2);}
 
         /* CARGA ANIMADA */
-        #zona-carga-segura { display: none; padding: 0 40px 15px; flex-shrink: 0;}
-        .indicador-carga { display: flex; gap: 6px; padding: 8px 0; }
+        .indicador-carga { display: flex; gap: 6px; align-items: center; padding: 5px 10px; height: 30px;}
         .punto { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
         .punto:nth-child(1) { animation-delay: -0.32s; }
         .punto:nth-child(2) { animation-delay: -0.16s; }
@@ -158,14 +155,26 @@
         .caja-input { width: 100%; max-width: 900px; display: flex; background: rgba(10,10,15,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 8px 10px 8px 15px; transition: 0.3s; align-items: center; gap: 8px;}
         .caja-input:focus-within { border-color: var(--accent); box-shadow: 0 0 20px rgba(0,229,255,0.2); }
         .caja-input input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 15px; width: 100%;}
+        .caja-input input:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .btn-adjuntar { background: transparent; color: var(--text-muted); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 5px;}
-        .btn-adjuntar:hover { color: var(--accent); transform: scale(1.1); }
+        .btn-adjuntar:hover:not(:disabled) { color: var(--accent); transform: scale(1.1); }
+        .btn-adjuntar:disabled { opacity: 0.3; cursor: not-allowed; }
         
         .btn-enviar { background: var(--text-main); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0;}
-        .btn-enviar:hover { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 15px var(--glow); }
+        .btn-enviar:hover { transform: scale(1.1); box-shadow: 0 0 15px var(--glow); background: var(--accent); }
+        
+        /* ESTADO DEL BOTÓN STOP */
+        .btn-detener { background: var(--danger) !important; color: #fff !important; box-shadow: 0 0 15px rgba(255, 68, 68, 0.6) !important; animation: pulse 1.5s infinite;}
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* OPTIMIZACIÓN MÓVIL ABSOLUTA */
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); box-shadow: 0 0 10px var(--accent); } }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
         @media (max-width: 768px) {
             .btn-menu-mobile { display: block; }
             .top-bar { padding: 12px 15px; }
@@ -175,7 +184,6 @@
             .mensajes-container { padding: 15px 15px; gap: 15px;}
             .burbuja { font-size: 14px; padding: 10px 14px; max-width: 90%;}
             .zona-input { padding: 10px 15px 15px; background: var(--bg-deep); border-top: 1px solid rgba(255,255,255,0.05); }
-            #zona-carga-segura { padding: 0 15px 10px; }
             .caja-input { padding: 5px 8px 5px 12px; }
         }
     </style>
@@ -279,13 +287,6 @@
                 </div>
             </div>
 
-            <div id="zona-carga-segura">
-                <div class="fila-msg ia">
-                    <img src="fenix-logo.jpg" class="avatar-ia" onerror="this.style.display='none'">
-                    <div class="burbuja ia indicador-carga"><div class="punto"></div><div class="punto"></div><div class="punto"></div></div>
-                </div>
-            </div>
-
             <div class="zona-input">
                 <div class="preview-archivo" id="preview-archivo">
                     <span id="texto-archivo">imagen.png</span>
@@ -306,7 +307,8 @@
                     <input type="text" id="input-chat" placeholder="Escribe o sube una imagen..." autocomplete="off">
                     
                     <button class="btn-enviar" id="btn-enviar">
-                        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path></svg>
+                        <svg id="icono-enviar" viewBox="0 0 24 24" width="20" height="20"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="currentColor"></path></svg>
+                        <svg id="icono-stop" viewBox="0 0 24 24" width="20" height="20" style="display:none;"><rect x="6" y="6" width="12" height="12" fill="currentColor"></rect></svg>
                     </button>
                 </div>
             </div>
@@ -336,6 +338,10 @@
         
         let archivoActualB64 = null;
         let mimeTypeActual = null;
+        
+        // VARIABLES DE CONTROL DE ESTADO DE IA
+        let controladorPeticion = null;
+        let iaEstaPensando = false;
 
         const RUTA_LOGO = "fenix-logo.jpg";
         const URL_RENDER = "https://fenix-backend-uqbg.onrender.com/api/chat";
@@ -363,10 +369,14 @@
             input: document.getElementById('input-chat'),
             bienvenida: document.getElementById('bienvenida-msg'),
             textoBienvenida: document.getElementById('texto-bienvenida'),
-            carga: document.getElementById('zona-carga-segura'),
             sidebar: document.getElementById('sidebar'),
             overlay: document.getElementById('sidebar-overlay'),
-            btnMenu: document.getElementById('btn-menu-mobile')
+            btnMenu: document.getElementById('btn-menu-mobile'),
+            btnEnviar: document.getElementById('btn-enviar'),
+            btnAdjuntar: document.getElementById('btn-adjuntar'),
+            btnSugerencia: document.getElementById('btn-sugerencia'),
+            iconoEnviar: document.getElementById('icono-enviar'),
+            iconoStop: document.getElementById('icono-stop')
         };
 
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
@@ -509,48 +519,29 @@
             });
         }
 
-        // === LOGICA DEL BUZÓN DE SUGERENCIAS 💡 ===
-        document.getElementById('btn-sugerencia').addEventListener('click', async () => {
-            if (!userActual || !chatActualId) return;
-            
+        DOM.btnSugerencia.addEventListener('click', async () => {
+            if (!userActual || !chatActualId || iaEstaPensando) return;
             const sugerencia = prompt("💡 ¿Tienes una idea para la campaña? Escríbela aquí y le llegará directo a Fernando y al equipo:");
-            
             if (sugerencia && sugerencia.trim() !== "") {
                 try {
-                    // Guarda en la base de datos central
                     await addDoc(collection(db, "buzon_sugerencias"), {
-                        texto: sugerencia,
-                        autorNombre: userActual.displayName || "Estudiante JPII",
-                        autorEmail: userActual.email,
-                        timestamp: serverTimestamp()
+                        texto: sugerencia, autorNombre: userActual.displayName || "Estudiante JPII", autorEmail: userActual.email, timestamp: serverTimestamp()
                     });
-                    
-                    // Notifica en el chat
                     const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
-                    await addDoc(refMensajes, { 
-                        texto: `**💡 Sugerencia enviada al equipo:**\n"${sugerencia}"\n\n¡Gracias por sumar a la Revolución, capitán! Fernando y el equipo la revisarán. 😎🔥`, 
-                        emisor: "ia", 
-                        timestamp: serverTimestamp() 
-                    });
-                    
+                    await addDoc(refMensajes, { texto: `**💡 Sugerencia enviada:**\n"${sugerencia}"\n\n¡Gracias por sumar a la Revolución! Fernando la revisará. 😎`, emisor: "ia", timestamp: serverTimestamp() });
                     scrollAbajo();
-                } catch(e) {
-                    alert("¡Uy! Hubo un problema enviando la sugerencia. Intenta de nuevo.");
-                }
+                } catch(e) { alert("Error enviando sugerencia."); }
             }
         });
 
-        // === LOGICA DE ADJUNTOS ===
-        document.getElementById('btn-adjuntar').addEventListener('click', () => document.getElementById('file-upload').click());
+        DOM.btnAdjuntar.addEventListener('click', () => { if(!iaEstaPensando) document.getElementById('file-upload').click(); });
         document.getElementById('file-upload').addEventListener('change', function() {
             const file = this.files[0];
             if(!file) return;
             if(file.size > 5 * 1024 * 1024) { alert("El archivo es muy pesado (Máx 5MB)."); return; }
-
             const reader = new FileReader();
             reader.onload = (e) => {
-                archivoActualB64 = e.target.result;
-                mimeTypeActual = file.type;
+                archivoActualB64 = e.target.result; mimeTypeActual = file.type;
                 document.getElementById('texto-archivo').innerText = "📎 " + file.name;
                 document.getElementById('preview-archivo').style.display = 'flex';
             };
@@ -563,8 +554,17 @@
             document.getElementById('preview-archivo').style.display = 'none';
         });
 
-        // === ENVIAR MENSAJE Y PAYLOAD REPARADO ===
+        // === ENVIAR MENSAJE (CON ABORT Y BLOQUEO) ===
         async function enviarMsg() {
+            // 1. SI ESTÁ PENSANDO, EL USUARIO APRETÓ EL BOTÓN STOP 🟥
+            if (iaEstaPensando) {
+                if (controladorPeticion) {
+                    controladorPeticion.abort(); // Dispara el error AbortError y detiene el fetch
+                }
+                return;
+            }
+
+            // 2. LÓGICA NORMAL DE ENVÍO
             const texto = DOM.input.value.trim();
             if (texto === "" && !archivoActualB64) return;
             DOM.input.value = "";
@@ -581,36 +581,74 @@
             } catch(e) { return; }
 
             const temperamentoActual = document.getElementById('select-temperamento').value;
-            
-            const payload = { 
-                mensaje: texto || "¿Qué hay en este archivo?",
-                temperamento: temperamentoActual
-            };
+            const payload = { mensaje: texto || "¿Qué hay en este archivo?", temperamento: temperamentoActual };
 
-            // SI HAY UN ARCHIVO, SE ADJUNTA AL PAYLOAD
             if(archivoActualB64) {
                 payload.archivoBase64 = archivoActualB64;
                 payload.mimeType = mimeTypeActual;
                 document.getElementById('btn-quitar-archivo').click();
             }
 
-            DOM.carga.style.display = 'block';
+            // 3. ACTIVAR MODO BLOQUEO "PENSANDO" Y BOTÓN STOP
+            iaEstaPensando = true;
+            DOM.input.disabled = true;
+            DOM.input.placeholder = "Fénix está pensando... (Toca 🟥 para cancelar)";
+            DOM.btnAdjuntar.disabled = true;
+            DOM.btnSugerencia.disabled = true;
+            DOM.iconoEnviar.style.display = 'none';
+            DOM.iconoStop.style.display = 'block';
+            DOM.btnEnviar.classList.add('btn-detener');
+
+            // 4. INSERTAR BURBUJA DE CARGA DINÁMICA DIRECTO EN EL CHAT
+            const idBurbujaCarga = 'cargando-' + Date.now();
+            DOM.mensajes.insertAdjacentHTML('beforeend', `
+                <div class="fila-msg ia" id="${idBurbujaCarga}">
+                    <img src="${RUTA_LOGO}" class="avatar-ia" onerror="this.style.display='none'">
+                    <div class="burbuja ia indicador-carga"><div class="punto"></div><div class="punto"></div><div class="punto"></div></div>
+                </div>
+            `);
             scrollAbajo();
 
+            controladorPeticion = new AbortController(); // Creamos el controlador para poder detenerlo
+
             try {
-                const res = await fetch(URL_RENDER, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const res = await fetch(URL_RENDER, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify(payload),
+                    signal: controladorPeticion.signal // Enlazamos el botón STOP a la petición
+                });
                 const data = await res.json();
-                DOM.carga.style.display = 'none';
+                
+                // Borramos la burbuja de carga
+                document.getElementById(idBurbujaCarga)?.remove();
                 
                 if(data.respuesta) await addDoc(refMensajes, { texto: data.respuesta, emisor: "ia", timestamp: serverTimestamp() });
                 else if(data.error) await addDoc(refMensajes, { texto: "⚠️ " + data.error, emisor: "ia", timestamp: serverTimestamp() });
+                
             } catch (error) {
-                DOM.carga.style.display = 'none';
-                await addDoc(refMensajes, { texto: "🔌 Error cuántico. Intenta de nuevo.", emisor: "ia", timestamp: serverTimestamp() });
+                document.getElementById(idBurbujaCarga)?.remove();
+                if (error.name === 'AbortError') {
+                    // El usuario tocó STOP
+                    await addDoc(refMensajes, { texto: "🚫 *Generación detenida por el estudiante.*", emisor: "ia sistema", timestamp: serverTimestamp() });
+                } else {
+                    await addDoc(refMensajes, { texto: "🔌 Error cuántico o servidor apagado. Intenta de nuevo.", emisor: "ia", timestamp: serverTimestamp() });
+                }
+            } finally {
+                // 5. RESTAURAR LA INTERFAZ NORMAL
+                iaEstaPensando = false;
+                DOM.input.disabled = false;
+                DOM.input.placeholder = "Escribe o sube una imagen...";
+                DOM.btnAdjuntar.disabled = false;
+                DOM.btnSugerencia.disabled = false;
+                DOM.iconoEnviar.style.display = 'block';
+                DOM.iconoStop.style.display = 'none';
+                DOM.btnEnviar.classList.remove('btn-detener');
+                DOM.input.focus();
+                scrollAbajo();
             }
         }
 
-        // === FUNCIÓN TRADUCTORA DE MARKDOWN ===
         function formatearTextoIA(texto) {
             let html = texto;
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
@@ -622,20 +660,21 @@
 
         function renderizarMensaje(texto, emisor) {
             const esUser = emisor === "user";
+            const esSistema = emisor === "ia sistema"; // Para el mensaje de "Generación detenida"
             const textoFinal = esUser ? texto.replace(/\n/g, '<br>') : formatearTextoIA(texto);
 
             const html = `
                 <div class="fila-msg ${esUser ? 'user' : 'ia'}">
                     ${!esUser ? `<img src="${RUTA_LOGO}" class="avatar-ia" onerror="this.style.display='none'">` : ''}
-                    <div class="burbuja ${esUser ? 'user' : 'ia'}">${textoFinal}</div>
+                    <div class="burbuja ${esUser ? 'user' : 'ia'} ${esSistema ? 'sistema' : ''}">${textoFinal}</div>
                 </div>
             `;
             DOM.mensajes.insertAdjacentHTML('beforeend', html);
         }
 
         function scrollAbajo() { DOM.mensajes.scrollTop = DOM.mensajes.scrollHeight; }
-        document.getElementById('btn-enviar').addEventListener('click', enviarMsg);
-        DOM.input.addEventListener("keypress", (e) => { if (e.key === "Enter") enviarMsg(); });
+        DOM.btnEnviar.addEventListener('click', enviarMsg);
+        DOM.input.addEventListener("keypress", (e) => { if (e.key === "Enter" && !iaEstaPensando) enviarMsg(); });
     </script>
 </body>
 </html>
