@@ -36,6 +36,28 @@
         .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
         .back-link:hover { color: var(--accent); transform: translateX(-5px); }
         .brand-title { font-weight: 900; color: var(--accent); letter-spacing: 2px; text-shadow: 0 0 10px var(--glow); }
+        
+        .modo-selector { 
+            background: rgba(0, 229, 255, 0.05); 
+            border: 1px solid rgba(0, 229, 255, 0.3); 
+            color: var(--accent); 
+            border-radius: 20px; 
+            padding: 5px 15px; 
+            font-size: 12px; 
+            font-weight: bold;
+            outline: none; 
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            text-align: center;
+            appearance: none;
+        }
+        .modo-selector:hover { background: rgba(0, 229, 255, 0.15); box-shadow: 0 0 10px var(--glow); }
+        .modo-selector option { background: var(--bg-deep); color: #fff; }
+        
+        @media (max-width: 768px) {
+            .brand-title { display: none; } 
+        }
 
         /* ================= AUTHENTICATION (LOGIN/REGISTRO) ================= */
         #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 500; background: var(--bg-deep); }
@@ -71,7 +93,6 @@
         .mail-icon { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--glow)); }
 
         /* ================= INTERFAZ DEL CHAT ================= */
-        /* Eliminamos el height fijo de calc y usamos flex: 1 para ocupar el resto de la pantalla */
         #chat-app { display: none; width: 100%; flex: 1; flex-direction: row; position: relative; overflow: hidden;}
         
         /* SIDEBAR & HISTORIAL */
@@ -144,14 +165,7 @@
         .btn-enviar { background: var(--text-main); color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; flex-shrink: 0;}
         .btn-enviar:hover { background: var(--accent); transform: scale(1.1); box-shadow: 0 0 15px var(--glow); }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); box-shadow: 0 0 10px var(--accent); } }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-
-        /* ================= OPTIMIZACIÓN MÓVIL ABSOLUTA ================= */
+        /* OPTIMIZACIÓN MÓVIL ABSOLUTA */
         @media (max-width: 768px) {
             .btn-menu-mobile { display: block; }
             .top-bar { padding: 12px 15px; }
@@ -160,7 +174,6 @@
             .chat-actions { opacity: 1; }
             .mensajes-container { padding: 15px 15px; gap: 15px;}
             .burbuja { font-size: 14px; padding: 10px 14px; max-width: 90%;}
-            /* Menos padding en la zona inferior para móviles */
             .zona-input { padding: 10px 15px 15px; background: var(--bg-deep); border-top: 1px solid rgba(255,255,255,0.05); }
             #zona-carga-segura { padding: 0 15px 10px; }
             .caja-input { padding: 5px 8px 5px 12px; }
@@ -177,6 +190,13 @@
                 <span class="back-text">Inicio</span>
             </a>
         </div>
+        
+        <select id="select-temperamento" class="modo-selector" title="Temperamento de la IA">
+            <option value="politico">😎 Modo Político</option>
+            <option value="analitico">🧠 Modo Analítico</option>
+            <option value="creativo">🎨 Modo Creativo</option>
+        </select>
+
         <span class="brand-title">FÉNIX IA</span>
     </div>
 
@@ -274,8 +294,13 @@
 
                 <div class="caja-input">
                     <input type="file" id="file-upload" accept="image/*,.pdf,.txt" style="display: none;">
+                    
                     <button class="btn-adjuntar" id="btn-adjuntar" title="Adjuntar Imagen o Documento">
                         <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                    </button>
+
+                    <button class="btn-adjuntar" id="btn-sugerencia" title="Enviar una sugerencia al equipo" style="font-size: 20px;">
+                        💡
                     </button>
 
                     <input type="text" id="input-chat" placeholder="Escribe o sube una imagen..." autocomplete="off">
@@ -315,7 +340,6 @@
         const RUTA_LOGO = "fenix-logo.jpg";
         const URL_RENDER = "https://fenix-backend-uqbg.onrender.com/api/chat";
 
-        // FRASES DINÁMICAS
         const frasesBienvenida = [
             "Hola campeón, soy Fénix. ¿Listo para la Revolución?",
             "¡Qué onda varón! ¿En qué te ayudo hoy?",
@@ -347,11 +371,9 @@
 
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
 
-        // === MENÚ MÓVIL ===
         DOM.btnMenu.addEventListener('click', () => { DOM.sidebar.classList.add('open'); DOM.overlay.style.display = 'block'; });
         DOM.overlay.addEventListener('click', () => { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; });
 
-        // === PESTAÑAS AUTH ===
         DOM.tabLogin.addEventListener('click', () => {
             DOM.tabLogin.classList.add('active'); DOM.tabReg.classList.remove('active');
             DOM.formLogin.classList.add('active'); DOM.formReg.classList.remove('active');
@@ -363,7 +385,6 @@
             DOM.error.style.display = 'none';
         });
 
-        // === AUTH LÓGICA ===
         document.getElementById('btn-google').addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando con Google."); }});
         document.getElementById('btn-login-mail').addEventListener('click', async () => { 
             try { 
@@ -398,7 +419,6 @@
             }
         });
 
-        // === GESTOR CHATS ===
         function setFraseBienvenida() {
             DOM.textoBienvenida.innerText = frasesBienvenida[Math.floor(Math.random() * frasesBienvenida.length)];
         }
@@ -470,7 +490,6 @@
         function abrirChat(idChat) {
             chatActualId = idChat;
             document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
-            // Ocultar menú en móviles al seleccionar
             if(window.innerWidth <= 768) { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; }
             
             if(unsubscribeMensajes) unsubscribeMensajes();
@@ -489,6 +508,37 @@
                 }
             });
         }
+
+        // === LOGICA DEL BUZÓN DE SUGERENCIAS 💡 ===
+        document.getElementById('btn-sugerencia').addEventListener('click', async () => {
+            if (!userActual || !chatActualId) return;
+            
+            const sugerencia = prompt("💡 ¿Tienes una idea para la campaña? Escríbela aquí y le llegará directo a Fernando y al equipo:");
+            
+            if (sugerencia && sugerencia.trim() !== "") {
+                try {
+                    // Guarda en la base de datos central
+                    await addDoc(collection(db, "buzon_sugerencias"), {
+                        texto: sugerencia,
+                        autorNombre: userActual.displayName || "Estudiante JPII",
+                        autorEmail: userActual.email,
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    // Notifica en el chat
+                    const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
+                    await addDoc(refMensajes, { 
+                        texto: `**💡 Sugerencia enviada al equipo:**\n"${sugerencia}"\n\n¡Gracias por sumar a la Revolución, capitán! Fernando y el equipo la revisarán. 😎🔥`, 
+                        emisor: "ia", 
+                        timestamp: serverTimestamp() 
+                    });
+                    
+                    scrollAbajo();
+                } catch(e) {
+                    alert("¡Uy! Hubo un problema enviando la sugerencia. Intenta de nuevo.");
+                }
+            }
+        });
 
         // === LOGICA DE ADJUNTOS ===
         document.getElementById('btn-adjuntar').addEventListener('click', () => document.getElementById('file-upload').click());
@@ -513,7 +563,7 @@
             document.getElementById('preview-archivo').style.display = 'none';
         });
 
-        // === ENVIAR MENSAJE ===
+        // === ENVIAR MENSAJE Y PAYLOAD REPARADO ===
         async function enviarMsg() {
             const texto = DOM.input.value.trim();
             if (texto === "" && !archivoActualB64) return;
@@ -530,9 +580,17 @@
                 await updateDoc(refChatPrincipal, { actualizado: serverTimestamp() });
             } catch(e) { return; }
 
-            const payload = { mensaje: texto || "¿Qué hay en este archivo?" };
+            const temperamentoActual = document.getElementById('select-temperamento').value;
+            
+            const payload = { 
+                mensaje: texto || "¿Qué hay en este archivo?",
+                temperamento: temperamentoActual
+            };
+
+            // SI HAY UN ARCHIVO, SE ADJUNTA AL PAYLOAD
             if(archivoActualB64) {
-                payload.archivoBase64 = archivoActualB64; payload.mimeType = mimeTypeActual;
+                payload.archivoBase64 = archivoActualB64;
+                payload.mimeType = mimeTypeActual;
                 document.getElementById('btn-quitar-archivo').click();
             }
 
@@ -555,21 +613,15 @@
         // === FUNCIÓN TRADUCTORA DE MARKDOWN ===
         function formatearTextoIA(texto) {
             let html = texto;
-            // Traduce negritas (**texto**)
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Traduce cursivas (*texto*)
             html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            // Traduce bloques de código o matemáticas simples (`texto`)
             html = html.replace(/`(.*?)`/g, '<code style="background:rgba(0,229,255,0.1); padding:2px 5px; border-radius:4px; color:var(--accent);">$1</code>');
-            // Convierte los saltos de línea en <br>
             html = html.replace(/\n/g, '<br>');
             return html;
         }
 
         function renderizarMensaje(texto, emisor) {
             const esUser = emisor === "user";
-            
-            // Pasamos el texto por el formateador SÓLO si es la IA quien habla
             const textoFinal = esUser ? texto.replace(/\n/g, '<br>') : formatearTextoIA(texto);
 
             const html = `
