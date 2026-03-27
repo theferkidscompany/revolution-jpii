@@ -704,16 +704,33 @@
             }
         }
         // ================= FORMATEO MARKDOWN PARA CÓDIGO Y LISTAS =================
-        function formatearTextoIA(texto) {
-            if (!texto) return "";
-            let html = texto;
-            
-            // 1. Negritas (**texto**)
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // 2. Cursivas (*texto*)
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            
-            // 3. Bloques de código gigantes (```código```)
-            html = html.replace(/
-http://googleusercontent.com/immersive_entry_chip/0
+function formatearTextoIA(texto) {
+    if (!texto) return "";
+
+    let html = texto
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+    // Bloques de código ```...```
+    html = html.replace(/```([\s\S]*?)```/g, function(_, code) {
+        return `<pre style="background:rgba(0,0,0,0.35);padding:12px;border-radius:12px;overflow:auto;border:1px solid rgba(255,255,255,0.08);margin:8px 0;"><code>${code.trim()}</code></pre>`;
+    });
+
+    // Código en línea `...`
+    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:6px;">$1</code>');
+
+    // Negritas
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // Cursivas
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+    // Viñetas simples
+    html = html.replace(/(^|\n)[\-\*]\s+(.+)/g, '$1• $2');
+
+    // Saltos de línea
+    html = html.replace(/\n/g, '<br>');
+
+    return html;
+}
