@@ -31,6 +31,7 @@
         /* HEADER & TOP BAR */
         .top-bar { padding: 15px 30px; background: rgba(3, 3, 5, 0.5); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 229, 255, 0.1); display: flex; justify-content: space-between; align-items: center; z-index: 300; position: relative; flex-shrink: 0;}
         .top-bar-left { display: flex; align-items: center; gap: 15px; }
+        .top-bar-center { display: flex; align-items: center; gap: 10px; }
         .btn-menu-mobile { display: none; background: transparent; border: none; color: var(--accent); font-size: 24px; cursor: pointer; padding: 5px; }
         .back-link { color: var(--text-muted); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
         .back-link:hover { color: var(--accent); transform: translateX(-5px); }
@@ -50,12 +51,15 @@
             transition: 0.3s;
             text-align: center;
             appearance: none;
+            min-width: 170px;
         }
         .modo-selector:hover { background: rgba(0, 229, 255, 0.15); box-shadow: 0 0 10px var(--glow); }
         .modo-selector option { background: var(--bg-deep); color: #fff; }
         
         @media (max-width: 768px) {
-            .brand-title { display: none; } 
+            .brand-title { display: none; }
+            .top-bar-center { gap: 8px; }
+            .modo-selector { min-width: 0; padding: 5px 10px; font-size: 11px; }
         }
 
         /* ================= AUTHENTICATION Y MODALES ================= */
@@ -201,12 +205,20 @@
                 <span class="back-text">Inicio</span>
             </a>
         </div>
-        
-        <select id="select-temperamento" class="modo-selector" title="Temperamento de la IA">
-            <option value="politico">😎 Modo Político</option>
-            <option value="analitico">🧠 Modo Analítico</option>
-            <option value="creativo">🎨 Modo Creativo</option>
-        </select>
+        <div class="top-bar-center">
+            <select id="select-temperamento" class="modo-selector" title="Modo de la IA">
+                <option value="politico">😎 Modo Político</option>
+                <option value="analitico">🧠 Modo Analítico</option>
+                <option value="creativo">🎨 Modo Creativo</option>
+                <option value="estudio">📚 Modo Estudio</option>
+            </select>
+
+            <select id="select-memoria" class="modo-selector" title="Memoria de la IA">
+                <option value="corta">🧠 Memoria Corta</option>
+                <option value="normal" selected>💾 Memoria Normal</option>
+                <option value="profunda">🚀 Memoria Profunda</option>
+            </select>
+        </div>
 
         <span class="brand-title">FÉNIX IA</span>
     </div>
@@ -396,6 +408,8 @@
             sidebar: document.getElementById('sidebar'),
             overlay: document.getElementById('sidebar-overlay'),
             btnMenu: document.getElementById('btn-menu-mobile'),
+            selectTemperamento: document.getElementById('select-temperamento'),
+            selectMemoria: document.getElementById('select-memoria'),
             btnEnviar: document.getElementById('btn-enviar'),
             btnAdjuntar: document.getElementById('btn-adjuntar'),
             btnSugerencia: document.getElementById('btn-sugerencia'),
@@ -407,6 +421,58 @@
         };
 
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
+
+        function obtenerLimiteMemoria() {
+            switch (DOM.selectMemoria.value) {
+                case 'corta':
+                    return 4;
+                case 'profunda':
+                    return 20;
+                default:
+                    return 10;
+            }
+        }
+
+        async function guardarConfiguracionUsuario() {
+            if (!userActual) return;
+
+            try {
+                await setDoc(doc(db, 'usuarios', userActual.uid), {
+                    configFenix: {
+                        modo: DOM.selectTemperamento.value,
+                        memoria: DOM.selectMemoria.value
+                    }
+                }, { merge: true });
+            } catch (e) {}
+        }
+
+        async function cargarConfiguracionUsuario() {
+            if (!userActual) return;
+
+            try {
+                const snap = await getDoc(doc(db, 'usuarios', userActual.uid));
+                const cfg = snap.exists() && snap.data().configFenix
+                    ? snap.data().configFenix
+                    : { modo: 'politico', memoria: 'normal' };
+
+                DOM.selectTemperamento.value = cfg.modo || 'politico';
+                DOM.selectMemoria.value = cfg.memoria || 'normal';
+            } catch (e) {
+                DOM.selectTemperamento.value = 'politico';
+                DOM.selectMemoria.value = 'normal';
+            }
+        }
+
+        DOM.selectTemperamento.addEventListener('change', guardarConfiguracionUsuario);
+        DOM.selectMemoria.addEventListener('change', guardarConfiguracionUsuario);
+
+        DOM.btnMenu.addEventListener('click', () => {
+            DOM.sidebar.classList.add('open');
+            DOM.overlay.style.display = 'block';
+        });
+
+        DOM.selectTemperamento.addEventListener('change', guardarConfiguracionUsuario);
+        DOM.selectMemoria.addEventListener('change', guardarConfiguracionUsuario);
 
         DOM.btnMenu.addEventListener('click', () => { DOM.sidebar.classList.add('open'); DOM.overlay.style.display = 'block'; });
         DOM.overlay.addEventListener('click', () => { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; });
@@ -452,26 +518,33 @@
                     DOM.btnAceptarTyC.onclick = async () => {
                         await setDoc(userDocRef, { tycAceptado: true, email: user.email }, { merge: true });
                         DOM.modalTyC.style.display = 'none';
-                        iniciarApp(user);
+                        await iniciarApp(user);
                     };
                     DOM.btnRechazarTyC.onclick = () => { signOut(auth); DOM.modalTyC.style.display = 'none'; };
                 } else {
-                    iniciarApp(user);
+                    await iniciarApp(user);
                 }
             } else {
-                userActual = null; chatActualId = null; chatHistorialLocal = [];
-                DOM.app.style.display = 'none'; DOM.login.style.display = 'flex';
+                userActual = null; 
+                chatActualId = null; 
+                chatHistorialLocal = [];
+                DOM.app.style.display = 'none'; 
+                DOM.login.style.display = 'flex';
                 if(unsubscribeMensajes) unsubscribeMensajes();
                 if(unsubscribeLista) unsubscribeLista();
             }
         });
 
-        function iniciarApp(user) {
+        async function iniciarApp(user) {
             userActual = user;
-            DOM.login.style.display = 'none'; DOM.app.style.display = 'flex';
+            DOM.login.style.display = 'none';
+            DOM.app.style.display = 'flex';
+
             const nombre = user.displayName || user.email.split('@')[0];
             document.getElementById('nombre-ui').innerText = nombre;
             document.getElementById('avatar-ui').src = user.photoURL || `https://ui-avatars.com/api/?name=${nombre}&background=00e5ff&color=000&bold=true`;
+
+            await cargarConfiguracionUsuario();
             cargarHistorialDeChats();
         }
 
@@ -534,13 +607,20 @@
             });
         }
 
-        async function crearNuevoChat() {
-            if (!userActual) return;
+        async function crearNuevoChat(abrirAlCrear = true) {
+            if (!userActual) return null;
             const refChats = collection(db, `usuarios/${userActual.uid}/mis_chats`);
-            const nuevoDoc = await addDoc(refChats, { titulo: "Nuevo Chat", actualizado: serverTimestamp() });
-            abrirChat(nuevoDoc.id);
+            const nuevoDoc = await addDoc(refChats, {
+                titulo: "Nuevo Chat",
+                actualizado: serverTimestamp(),
+                creado: serverTimestamp()
+            });
+
+            if (abrirAlCrear) abrirChat(nuevoDoc.id);
+            return nuevoDoc.id;
         }
-        document.getElementById('btn-nuevo-chat').addEventListener('click', crearNuevoChat);
+
+        document.getElementById('btn-nuevo-chat').addEventListener('click', () => crearNuevoChat(true));
 
         function abrirChat(idChat) {
             chatActualId = idChat;
@@ -631,14 +711,47 @@
             } catch(e) { return; }
 
             const temperamentoActual = document.getElementById('select-temperamento').value;
+        async function enviarMsg() {
+            if (iaEstaPensando) {
+                if (controladorPeticion) { controladorPeticion.abort(); }
+                return;
+            }
+
+            const texto = DOM.input.value.trim();
+            if (texto === "" && !archivoActualB64) return;
+            DOM.input.value = "";
+
+            if (!chatActualId) {
+                chatActualId = await crearNuevoChat(true);
+                if (!chatActualId) return;
+            }
+
+            const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
+            const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
+            
+            let textoVisible = texto;
+            if (archivoActualB64) textoVisible = `<span class="adjunto-badge">📎 Archivo Adjunto</span>` + textoVisible;
+
+            const necesitaTitulo = chatHistorialLocal.length === 0;
+
+            try { 
+                await addDoc(refMensajes, { texto: textoVisible, emisor: "user", timestamp: serverTimestamp() }); 
+                await updateDoc(refChatPrincipal, { actualizado: serverTimestamp() });
+            } catch(e) { return; }
+
+            const temperamentoActual = DOM.selectTemperamento.value;
+            const memoriaActual = DOM.selectMemoria.value;
+
             const payload = { 
-                mensaje: texto || "¿Qué hay en este archivo?", 
+                mensaje: texto || "¿Qué hay en este archivo?",
                 temperamento: temperamentoActual,
-                historial: chatHistorialLocal.slice(-6),
+                modo: temperamentoActual,
+                configMemoria: memoriaActual,
+                historial: chatHistorialLocal.slice(-obtenerLimiteMemoria()),
                 generarTitulo: necesitaTitulo
             };
 
-            if(archivoActualB64) {
+            if (archivoActualB64) {
                 payload.archivoBase64 = archivoActualB64;
                 payload.mimeType = mimeTypeActual;
                 document.getElementById('btn-quitar-archivo').click();
@@ -652,7 +765,6 @@
             DOM.iconoEnviar.style.display = 'none';
             DOM.iconoStop.style.display = 'block';
             DOM.btnEnviar.classList.add('btn-detener');
-
             const idBurbujaCarga = 'cargando-' + Date.now();
             DOM.mensajes.insertAdjacentHTML('beforeend', `
                 <div class="fila-msg ia" id="${idBurbujaCarga}">
