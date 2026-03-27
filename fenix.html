@@ -704,33 +704,82 @@
             }
         }
         // ================= FORMATEO MARKDOWN PARA CÓDIGO Y LISTAS =================
-function formatearTextoIA(texto) {
-    if (!texto) return "";
+        function formatearTextoIA(texto) {
+            if (!texto) return "";
 
-    let html = texto
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+            let html = texto
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
 
-    // Bloques de código ```...```
-    html = html.replace(/```([\s\S]*?)```/g, function(_, code) {
-        return `<pre style="background:rgba(0,0,0,0.35);padding:12px;border-radius:12px;overflow:auto;border:1px solid rgba(255,255,255,0.08);margin:8px 0;"><code>${code.trim()}</code></pre>`;
-    });
+            // Bloques de código ```...```
+            html = html.replace(/```([\s\S]*?)```/g, function (_, code) {
+                return `<pre style="background:rgba(0,0,0,0.35);padding:12px;border-radius:12px;overflow:auto;border:1px solid rgba(255,255,255,0.08);margin:8px 0;"><code>${code.trim()}</code></pre>`;
+            });
 
-    // Código en línea `...`
-    html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:6px;">$1</code>');
+            // Código en línea `...`
+            html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:6px;">$1</code>');
 
-    // Negritas
-    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Negritas
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-    // Cursivas
-    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            // Cursivas
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
 
-    // Viñetas simples
-    html = html.replace(/(^|\n)[\-\*]\s+(.+)/g, '$1• $2');
+            // Viñetas simples
+            html = html.replace(/(^|\n)[\-\*]\s+(.+)/g, '$1• $2');
 
-    // Saltos de línea
-    html = html.replace(/\n/g, '<br>');
+            // Saltos de línea
+            html = html.replace(/\n/g, '<br>');
 
-    return html;
-}
+            return html;
+        }
+
+        function renderizarMensaje(texto, emisor) {
+            DOM.bienvenida.style.display = 'none';
+
+            const fila = document.createElement('div');
+            fila.className = `fila-msg ${emisor.includes('user') ? 'user' : 'ia'}`;
+
+            const esUsuario = emisor.includes('user');
+            const esSistema = emisor.includes('sistema');
+
+            if (!esUsuario) {
+                const avatar = document.createElement('img');
+                avatar.src = RUTA_LOGO;
+                avatar.className = 'avatar-ia';
+                avatar.onerror = function () { this.style.display = 'none'; };
+                fila.appendChild(avatar);
+            }
+
+            const burbuja = document.createElement('div');
+            burbuja.className = `burbuja ${esUsuario ? 'user' : esSistema ? 'sistema' : 'ia'}`;
+
+            // Mantener el badge de adjunto en mensajes del usuario
+            if (esUsuario && typeof texto === 'string' && texto.includes('adjunto-badge')) {
+                burbuja.innerHTML = texto;
+            } else {
+                burbuja.innerHTML = formatearTextoIA(texto);
+            }
+
+            fila.appendChild(burbuja);
+            DOM.mensajes.appendChild(fila);
+        }
+
+        function scrollAbajo() {
+            DOM.mensajes.scrollTop = DOM.mensajes.scrollHeight;
+        }
+
+        DOM.btnEnviar.addEventListener('click', enviarMsg);
+
+        DOM.input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarMsg();
+            }
+        });
+
+        setFraseBienvenida();
+    </script>
+</body>
+</html>
