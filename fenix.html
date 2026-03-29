@@ -925,9 +925,11 @@
                     <div class="profile-config-row"><span>Intereses</span><strong id="profile-intereses-resumen">Aún no guardados</strong></div>
                     <div class="profile-config-row"><span>Preferencia</span><strong id="profile-preferencia-resumen">Automática</strong></div>
                     <div class="profile-config-row"><span>Memoria útil</span><strong id="profile-memoria-resumen">Auto</strong></div>
+                    <div class="profile-config-row"><span>Algoritmo</span><strong id="profile-algoritmo-resumen">Equilibrado</strong></div>
+                    <div class="profile-config-row"><span>Búsqueda web</span><strong id="profile-busqueda-resumen">Automática</strong></div>
                 </div>
                 <div class="profile-config-actions">
-                    <button class="profile-config-button" id="btn-open-settings-inline">⚙️ Abrir configuración completa</button>
+                    <button class="profile-config-button" id="btn-open-settings-inline">⚙️ Editar memoria y ajustes IA</button>
                     <button class="sidebar-admin-button" id="btn-admin-panel">🛡️ Panel Admin Fénix</button>
                 </div>
             </div>
@@ -1076,6 +1078,8 @@
             profileInteresesResumen: document.getElementById('profile-intereses-resumen'),
             profilePreferenciaResumen: document.getElementById('profile-preferencia-resumen'),
             profileMemoriaResumen: document.getElementById('profile-memoria-resumen'),
+            profileAlgoritmoResumen: document.getElementById('profile-algoritmo-resumen'),
+            profileBusquedaResumen: document.getElementById('profile-busqueda-resumen'),
             profileConfigBadge: document.getElementById('profile-config-badge'),
             btnGuardarSettings: document.getElementById('btn-guardar-settings'),
             btnCerrarSettings: document.getElementById('btn-cerrar-settings'),
@@ -1190,6 +1194,8 @@
             const memoria = preferenciasActuales.autoMemory
                 ? 'Auto'
                 : (MEMORIA_META[DOM.selectMemoria.value || 'normal']?.label || 'Normal');
+            const algoritmo = ALGORITMO_META[algoritmoActual || 'equilibrado']?.label || 'Equilibrado';
+            const busqueda = preferenciasActuales.deepSearch ? 'Profunda' : 'Automática';
 
             DOM.profileCiudadResumen.textContent = ciudad || 'No definida';
             DOM.profileInteresesResumen.textContent = intereses
@@ -1197,11 +1203,14 @@
                 : 'Aún no guardados';
             DOM.profilePreferenciaResumen.textContent = preferencia;
             DOM.profileMemoriaResumen.textContent = memoria;
+            DOM.profileAlgoritmoResumen.textContent = algoritmo;
+            DOM.profileBusquedaResumen.textContent = busqueda;
 
             const badge = [
                 preferenciasActuales.autoMode ? 'A' : 'M',
                 preferenciasActuales.deepSearch ? 'W' : '',
-                preferenciasActuales.bilingualTouch ? 'EN' : ''
+                preferenciasActuales.bilingualTouch ? 'EN' : '',
+                algoritmoActual === 'investigador' ? 'R' : ''
             ].filter(Boolean).join('·');
             DOM.profileConfigBadge.textContent = badge || 'AI';
         }
@@ -1302,7 +1311,7 @@
                 modo,
                 memoria,
                 algoritmo,
-                nota: `Auto-switch active · ${preferenciasActuales.autoMode ? 'Modo adaptado' : 'Modo fijo'} · ${preferenciasActuales.autoMemory ? 'Memoria optimizada' : 'Memoria fija'}`
+                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo fijo'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria fija'} · ${preferenciasActuales.deepSearch ? 'Web profunda' : 'Web normal'}`
             };
 
             actualizarUIConfig();
@@ -1334,12 +1343,27 @@
                     headers: { 'x-admin-email': userActual?.email || '' }
                 });
                 const data = await res.json();
-                DOM.adminKpiAlertas.textContent = data.alertas ?? '0';
-                DOM.adminKpiFeedback.textContent = data.feedback ?? '0';
-                DOM.adminKpiChats.textContent = data.chats ?? '0';
+                const totalAlertas = Array.isArray(data.alertas) ? data.alertas.length : (data.alertas ?? 0);
+                const totalFeedback = Array.isArray(data.feedback) ? data.feedback.length : (data.feedback ?? 0);
+
+                DOM.adminKpiAlertas.textContent = data.kpis?.alertas ?? totalAlertas ?? '0';
+                DOM.adminKpiFeedback.textContent = data.kpis?.feedback ?? totalFeedback ?? '0';
+                DOM.adminKpiChats.textContent = data.kpis?.chats ?? data.chats ?? '0';
                 DOM.adminKpiModelo.textContent = data.estado || 'Online';
 
-                const items = Array.isArray(data.logs) ? data.logs : [];
+                const items = Array.isArray(data.logs)
+                    ? data.logs
+                    : [
+                        ...(Array.isArray(data.alertas) ? data.alertas.slice(0, 8).map((a) => ({
+                            titulo: 'Alerta',
+                            detalle: `${a.categoria || 'general'} · ${(a.nombre || a.email || 'Sin nombre')} · ${(a.mensaje || '').slice(0, 120)}`
+                        })) : []),
+                        ...(Array.isArray(data.feedback) ? data.feedback.slice(0, 8).map((f) => ({
+                            titulo: 'Feedback',
+                            detalle: `${f.tipo || 'sin tipo'} · ${f.motivo || 'sin motivo'}`
+                        })) : [])
+                    ];
+
                 DOM.adminLog.innerHTML = items.length
                     ? items.map((item) => `<div class="admin-log-item"><strong>${item.titulo || 'Evento'}:</strong> ${item.detalle || ''}</div>`).join('')
                     : '<div class="admin-log-item">Sin eventos recientes. Cuando el backend empiece a registrar alertas, feedback y entrenamientos, aparecerán aquí.</div>';
