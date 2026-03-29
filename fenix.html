@@ -922,11 +922,7 @@
                 </div>
                 <div class="profile-config-list">
                     <div class="profile-config-row"><span>Ubicación</span><strong id="profile-ciudad-resumen">No definida</strong></div>
-                    <div class="profile-config-row"><span>Intereses</span><strong id="profile-intereses-resumen">Aún no guardados</strong></div>
-                    <div class="profile-config-row"><span>Preferencia</span><strong id="profile-preferencia-resumen">Automática</strong></div>
-                    <div class="profile-config-row"><span>Memoria útil</span><strong id="profile-memoria-resumen">Auto</strong></div>
                     <div class="profile-config-row"><span>Algoritmo</span><strong id="profile-algoritmo-resumen">Equilibrado</strong></div>
-                    <div class="profile-config-row"><span>Búsqueda web</span><strong id="profile-busqueda-resumen">Automática</strong></div>
                 </div>
                 <div class="profile-config-actions">
                     <button class="profile-config-button" id="btn-open-settings-inline">⚙️ Editar memoria y ajustes IA</button>
@@ -1007,6 +1003,7 @@
         
         let archivoActualB64 = null;
         let mimeTypeActual = null;
+        let ultimoArchivoContexto = null;
         
         // VARIABLES DE CONTROL DE ESTADO DE IA
         let controladorPeticion = null;
@@ -1075,11 +1072,7 @@
             btnOpenSettings: document.getElementById('btn-open-settings'),
             btnOpenSettingsInline: document.getElementById('btn-open-settings-inline'),
             profileCiudadResumen: document.getElementById('profile-ciudad-resumen'),
-            profileInteresesResumen: document.getElementById('profile-intereses-resumen'),
-            profilePreferenciaResumen: document.getElementById('profile-preferencia-resumen'),
-            profileMemoriaResumen: document.getElementById('profile-memoria-resumen'),
             profileAlgoritmoResumen: document.getElementById('profile-algoritmo-resumen'),
-            profileBusquedaResumen: document.getElementById('profile-busqueda-resumen'),
             profileConfigBadge: document.getElementById('profile-config-badge'),
             btnGuardarSettings: document.getElementById('btn-guardar-settings'),
             btnCerrarSettings: document.getElementById('btn-cerrar-settings'),
@@ -1187,30 +1180,15 @@
 
         function actualizarResumenConfiguracionPerfil() {
             const ciudad = (preferenciasActuales.ciudad || '').trim();
-            const intereses = (preferenciasActuales.intereses || '').trim();
-            const preferencia = preferenciasActuales.modoPreferido
-                ? (MODO_META[preferenciasActuales.modoPreferido]?.label || preferenciasActuales.modoPreferido)
-                : 'Automática';
-            const memoria = preferenciasActuales.autoMemory
-                ? 'Auto'
-                : (MEMORIA_META[DOM.selectMemoria.value || 'normal']?.label || 'Normal');
             const algoritmo = ALGORITMO_META[algoritmoActual || 'equilibrado']?.label || 'Equilibrado';
-            const busqueda = preferenciasActuales.deepSearch ? 'Profunda' : 'Automática';
 
             DOM.profileCiudadResumen.textContent = ciudad || 'No definida';
-            DOM.profileInteresesResumen.textContent = intereses
-                ? (intereses.length > 28 ? intereses.slice(0, 28) + '…' : intereses)
-                : 'Aún no guardados';
-            DOM.profilePreferenciaResumen.textContent = preferencia;
-            DOM.profileMemoriaResumen.textContent = memoria;
             DOM.profileAlgoritmoResumen.textContent = algoritmo;
-            DOM.profileBusquedaResumen.textContent = busqueda;
 
             const badge = [
                 preferenciasActuales.autoMode ? 'A' : 'M',
                 preferenciasActuales.deepSearch ? 'W' : '',
-                preferenciasActuales.bilingualTouch ? 'EN' : '',
-                algoritmoActual === 'investigador' ? 'R' : ''
+                preferenciasActuales.bilingualTouch ? 'EN' : ''
             ].filter(Boolean).join('·');
             DOM.profileConfigBadge.textContent = badge || 'AI';
         }
@@ -1282,6 +1260,24 @@
             return 'normal';
         }
 
+
+        function debeReutilizarArchivo(texto) {
+            const t = (texto || '').toLowerCase();
+            if (!ultimoArchivoContexto || ultimoArchivoContexto.chatId !== chatActualId) return false;
+            if (Date.now() - (ultimoArchivoContexto.timestamp || 0) > 1000 * 60 * 20) return false;
+            return /clave|alternativa|respuesta|resuelve|resuelvelo|resu[eé]lv|explicame|expl[ií]ca|solo la|solo dame|opcion|opción|adjunto|archivo|pregunta/.test(t);
+        }
+
+        function registrarArchivoContexto(base64, mimeType, nombre) {
+            ultimoArchivoContexto = {
+                base64,
+                mimeType,
+                nombre: nombre || 'archivo',
+                chatId: chatActualId,
+                timestamp: Date.now()
+            };
+        }
+
         function refrescarStatusIA() {
             const modo = ultimaDecisionIA.modo || DOM.selectTemperamento.value || 'politico';
             const memoria = ultimaDecisionIA.memoria || DOM.selectMemoria.value || 'normal';
@@ -1311,11 +1307,11 @@
                 modo,
                 memoria,
                 algoritmo,
-                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo fijo'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria fija'} · ${preferenciasActuales.deepSearch ? 'Web profunda' : 'Web normal'}`
+                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual'} · ${preferenciasActuales.deepSearch ? 'Web profunda' : 'Web normal'}`
             };
 
             actualizarUIConfig();
-        actualizarResumenConfiguracionPerfil();
+            actualizarResumenConfiguracionPerfil();
             refrescarStatusIA();
             await guardarConfiguracionUsuario();
         }
@@ -1414,14 +1410,22 @@
             refrescarStatusIA();
         }
 
-        function aplicarModo(valor) {
+        function aplicarModo(valor, manual = false) {
             DOM.selectTemperamento.value = valor;
+            if (manual) {
+                preferenciasActuales.autoMode = false;
+                actualizarSwitch(DOM.toggleAutoMode, false);
+            }
             actualizarUIConfig();
             DOM.selectTemperamento.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
-        function aplicarMemoria(valor) {
+        function aplicarMemoria(valor, manual = false) {
             DOM.selectMemoria.value = valor;
+            if (manual) {
+                preferenciasActuales.autoMemory = false;
+                actualizarSwitch(DOM.toggleAutoMemory, false);
+            }
             actualizarUIConfig();
             DOM.selectMemoria.dispatchEvent(new Event('change', { bubbles: true }));
         }
@@ -1611,15 +1615,17 @@
         });
 
         document.querySelectorAll('[data-mode-value]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                aplicarModo(btn.dataset.modeValue);
+            btn.addEventListener('click', async () => {
+                aplicarModo(btn.dataset.modeValue, true);
+                await guardarConfiguracionUsuario();
                 cerrarPopoversConfiguracion();
             });
         });
 
         document.querySelectorAll('[data-memory-value]').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                aplicarMemoria(btn.dataset.memoryValue);
+            btn.addEventListener('click', async () => {
+                aplicarMemoria(btn.dataset.memoryValue, true);
+                await guardarConfiguracionUsuario();
                 cerrarPopoversConfiguracion();
             });
         });
@@ -1926,8 +1932,12 @@
             const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
             const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
 
+            const reutilizarArchivo = !archivoActualB64 && debeReutilizarArchivo(texto);
+            const archivoPayload = archivoActualB64 || (reutilizarArchivo ? ultimoArchivoContexto?.base64 : null);
+            const mimePayload = mimeTypeActual || (reutilizarArchivo ? ultimoArchivoContexto?.mimeType : null);
+
             let textoVisible = texto;
-            if (archivoActualB64) textoVisible = `<span class="adjunto-badge">📎 Archivo Adjunto</span>` + textoVisible;
+            if (archivoPayload) textoVisible = `<span class="adjunto-badge">📎 Archivo Adjunto</span>` + textoVisible;
 
             const necesitaTitulo = !chatHistorialLocal.some(msg => msg.emisor === 'user');
             const primerMensajeUsuario = necesitaTitulo ? texto : null;
@@ -1940,7 +1950,7 @@
             }
 
             const payload = {
-                mensaje: texto || '¿Qué hay en este archivo?',
+                mensaje: texto || (archivoPayload ? 'Resuelve el contenido del archivo y responde según la instrucción actual.' : '¿Qué hay en este archivo?'),
                 temperamento: DOM.selectTemperamento.value,
                 modo: DOM.selectTemperamento.value,
                 configMemoria: DOM.selectMemoria.value,
@@ -1954,13 +1964,18 @@
                 userMeta: {
                     nombre: userActual?.displayName || document.getElementById('nombre-ui').innerText || '',
                     email: userActual?.email || ''
-                }
+                },
+                modoManual: !preferenciasActuales.autoMode
             };
 
-            if (archivoActualB64) {
-                payload.archivoBase64 = archivoActualB64;
-                payload.mimeType = mimeTypeActual;
-                document.getElementById('btn-quitar-archivo').click();
+            if (archivoPayload) {
+                payload.archivoBase64 = archivoPayload;
+                payload.mimeType = mimePayload;
+                payload.archivoReutilizado = reutilizarArchivo;
+                if (archivoActualB64) {
+                    registrarArchivoContexto(archivoActualB64, mimeTypeActual, document.getElementById('texto-archivo').innerText || 'archivo');
+                    document.getElementById('btn-quitar-archivo').click();
+                }
             }
 
             iaEstaPensando = true;
@@ -1998,6 +2013,16 @@
                         titulo: data.tituloNuevo,
                         actualizado: serverTimestamp()
                     });
+                }
+
+                if (data.modoAplicado) {
+                    ultimaDecisionIA = {
+                        modo: data.modoAplicado,
+                        memoria: DOM.selectMemoria.value,
+                        algoritmo: algoritmoActual,
+                        nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual'} · ${data.motor || 'Motor listo'}`
+                    };
+                    refrescarStatusIA();
                 }
 
                 if (data.respuesta) {
