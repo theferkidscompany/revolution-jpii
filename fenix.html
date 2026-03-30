@@ -1285,7 +1285,7 @@
             DOM.statusModePill.textContent = `${MODO_META[modo]?.emoji || '🤖'} ${MODO_META[modo]?.label || 'Modo'}`;
             DOM.statusMemoryPill.textContent = `${memoria === 'corta' ? '⚡' : memoria === 'profunda' ? '🚀' : '💾'} ${MEMORIA_META[memoria]?.label || 'Memoria'}`;
             DOM.statusAlgorithmPill.textContent = `${algoritmo === 'breve' ? '✂️' : algoritmo === 'profesor' ? '🎓' : algoritmo === 'investigador' ? '🌐' : '⚖️'} ${ALGORITMO_META[algoritmo]?.label || 'Equilibrado'}`;
-            DOM.statusAutoNote.textContent = ultimaDecisionIA.nota || 'Thinking profile ready · Fénix se adapta al contexto.';
+            DOM.statusAutoNote.textContent = ultimaDecisionIA.nota || 'Perfil listo · Fénix se adapta al contexto sin forzar cambios.';
         }
 
         async function aplicarAutomatizacionAntesDeEnviar(texto) {
@@ -1307,7 +1307,7 @@
                 modo,
                 memoria,
                 algoritmo,
-                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual'} · ${preferenciasActuales.deepSearch ? 'Web profunda' : 'Web normal'}`
+                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual fijo'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual fija'} · ${preferenciasActuales.deepSearch ? 'Web profunda activa' : 'Web profunda apagada'}`
             };
 
             actualizarUIConfig();
