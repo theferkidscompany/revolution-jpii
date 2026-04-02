@@ -587,6 +587,10 @@
                     <div class="config-popover" id="popover-modo">
                         <div class="popover-title">Modo de Fénix</div>
                         <div class="config-options">
+                            <button class="config-chip" type="button" data-mode-value="auto">
+                                <span class="config-chip-emoji">✨</span>
+                                <span class="config-chip-text"><strong>Modo Auto</strong><span>Fénix decide según el mensaje.</span></span>
+                            </button>
                             <button class="config-chip" type="button" data-mode-value="politico">
                                 <span class="config-chip-emoji">😎</span>
                                 <span class="config-chip-text"><strong>Modo Político</strong><span>Campaña, energía y persuasión.</span></span>
@@ -606,6 +610,7 @@
                         </div>
                     </div>
                     <select id="select-temperamento" class="visually-hidden-select" title="Modo de la IA">
+                        <option value="auto">Modo Auto</option>
                         <option value="politico">Modo Político</option>
                         <option value="analitico">Modo Analítico</option>
                         <option value="creativo">Modo Creativo</option>
@@ -621,6 +626,10 @@
                     <div class="config-popover" id="popover-memoria">
                         <div class="popover-title">Memoria activa</div>
                         <div class="config-options">
+                            <button class="config-chip" type="button" data-memory-value="auto">
+                                <span class="config-chip-emoji">🪄</span>
+                                <span class="config-chip-text"><strong>Memoria Auto</strong><span>Fénix ajusta la memoria según el contexto.</span></span>
+                            </button>
                             <button class="config-chip" type="button" data-memory-value="corta">
                                 <span class="config-chip-emoji">⚡</span>
                                 <span class="config-chip-text"><strong>Corta</strong><span>Solo lo más reciente.</span></span>
@@ -636,6 +645,7 @@
                         </div>
                     </div>
                     <select id="select-memoria" class="visually-hidden-select" title="Memoria de la IA">
+                        <option value="auto">Memoria Auto</option>
                         <option value="corta">Memoria Corta</option>
                         <option value="normal" selected>Memoria Normal</option>
                         <option value="profunda">Memoria Profunda</option>
@@ -1004,6 +1014,7 @@
         let archivoActualB64 = null;
         let mimeTypeActual = null;
         let ultimoArchivoContexto = null;
+        let ultimoDocumentoContexto = null;
         
         // VARIABLES DE CONTROL DE ESTADO DE IA
         let controladorPeticion = null;
@@ -1098,6 +1109,7 @@
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
 
         const MODO_META = {
+            auto: { emoji: '✨', label: 'Modo Auto' },
             politico: { emoji: '😎', label: 'Modo Político' },
             analitico: { emoji: '🧠', label: 'Modo Analítico' },
             creativo: { emoji: '🎨', label: 'Modo Creativo' },
@@ -1105,6 +1117,7 @@
         };
 
         const MEMORIA_META = {
+            auto: { badge: 'A', label: 'Memoria Auto' },
             corta: { badge: 'C', label: 'Memoria Corta' },
             normal: { badge: 'N', label: 'Memoria Normal' },
             profunda: { badge: 'P', label: 'Memoria Profunda' }
@@ -1132,10 +1145,10 @@
             deepSearch: false
         };
         let ultimaDecisionIA = {
-            modo: 'politico',
-            memoria: 'normal',
+            modo: 'auto',
+            memoria: 'auto',
             algoritmo: 'equilibrado',
-            nota: 'Thinking profile ready · Fénix se adapta al contexto.'
+            nota: 'Thinking profile ready · Fénix se adapta con estilo humano.'
         };
         const ADMIN_EMAILS = ['theferkidscompany@gmail.com'];
 
@@ -1278,6 +1291,16 @@
             };
         }
 
+        function registrarDocumentoContexto(textoExtraido, resumen) {
+            if (!textoExtraido && !resumen) return;
+            ultimoDocumentoContexto = {
+                textoExtraido: (textoExtraido || '').trim(),
+                resumen: (resumen || '').trim(),
+                chatId: chatActualId,
+                timestamp: Date.now()
+            };
+        }
+
         function refrescarStatusIA() {
             const modo = ultimaDecisionIA.modo || DOM.selectTemperamento.value || 'politico';
             const memoria = ultimaDecisionIA.memoria || DOM.selectMemoria.value || 'normal';
@@ -1289,16 +1312,16 @@
         }
 
         async function aplicarAutomatizacionAntesDeEnviar(texto) {
-            let modo = DOM.selectTemperamento.value || 'politico';
-            let memoria = DOM.selectMemoria.value || 'normal';
+            let modo = DOM.selectTemperamento.value || 'auto';
+            let memoria = DOM.selectMemoria.value || 'auto';
             const algoritmo = algoritmoActual || 'equilibrado';
 
-            if (preferenciasActuales.autoMode) {
+            if (preferenciasActuales.autoMode || modo === 'auto') {
                 modo = detectarModoAutomatico(texto);
                 DOM.selectTemperamento.value = modo;
             }
 
-            if (preferenciasActuales.autoMemory) {
+            if (preferenciasActuales.autoMemory || memoria === 'auto') {
                 memoria = detectarMemoriaAutomatica(texto);
                 DOM.selectMemoria.value = memoria;
             }
@@ -1384,21 +1407,21 @@
         }
 
         function actualizarUIConfig() {
-            const modo = DOM.selectTemperamento.value || 'politico';
-            const memoria = DOM.selectMemoria.value || 'normal';
+            const modo = DOM.selectTemperamento.value || 'auto';
+            const memoria = DOM.selectMemoria.value || 'auto';
 
-            DOM.modoIndicador.textContent = MODO_META[modo]?.emoji || '😎';
-            DOM.memoriaIndicador.textContent = MEMORIA_META[memoria]?.badge || 'N';
+            DOM.modoIndicador.textContent = MODO_META[modo]?.emoji || '✨';
+            DOM.memoriaIndicador.textContent = MEMORIA_META[memoria]?.badge || 'A';
             DOM.algoritmoIndicador.textContent = ALGORITMO_META[algoritmoActual]?.badge || 'A';
             DOM.btnModo.setAttribute('aria-label', MODO_META[modo]?.label || 'Modo');
             DOM.btnMemoria.setAttribute('aria-label', MEMORIA_META[memoria]?.label || 'Memoria');
             DOM.btnAlgoritmo.setAttribute('aria-label', ALGORITMO_META[algoritmoActual]?.label || 'Algoritmo');
 
             document.querySelectorAll('[data-mode-value]').forEach((btn) => {
-                btn.classList.toggle('active', btn.dataset.modeValue === modo);
+                btn.classList.toggle('active', btn.dataset.modeValue === (preferenciasActuales.autoMode ? 'auto' : modo));
             });
             document.querySelectorAll('[data-memory-value]').forEach((btn) => {
-                btn.classList.toggle('active', btn.dataset.memoryValue === memoria);
+                btn.classList.toggle('active', btn.dataset.memoryValue === (preferenciasActuales.autoMemory ? 'auto' : memoria));
             });
             document.querySelectorAll('[data-algorithm-value]').forEach((btn) => {
                 btn.classList.toggle('active', btn.dataset.algorithmValue === algoritmoActual);
@@ -1411,8 +1434,14 @@
         }
 
         function aplicarModo(valor, manual = false) {
-            DOM.selectTemperamento.value = valor;
-            if (manual) {
+            if (valor === 'auto') {
+                preferenciasActuales.autoMode = true;
+                actualizarSwitch(DOM.toggleAutoMode, true);
+                DOM.selectTemperamento.value = detectarModoAutomatico(DOM.input.value || '') || 'politico';
+            } else {
+                DOM.selectTemperamento.value = valor;
+            }
+            if (manual && valor !== 'auto') {
                 preferenciasActuales.autoMode = false;
                 actualizarSwitch(DOM.toggleAutoMode, false);
             }
@@ -1421,8 +1450,14 @@
         }
 
         function aplicarMemoria(valor, manual = false) {
-            DOM.selectMemoria.value = valor;
-            if (manual) {
+            if (valor === 'auto') {
+                preferenciasActuales.autoMemory = true;
+                actualizarSwitch(DOM.toggleAutoMemory, true);
+                DOM.selectMemoria.value = detectarMemoriaAutomatica(DOM.input.value || '') || 'normal';
+            } else {
+                DOM.selectMemoria.value = valor;
+            }
+            if (manual && valor !== 'auto') {
                 preferenciasActuales.autoMemory = false;
                 actualizarSwitch(DOM.toggleAutoMemory, false);
             }
@@ -1933,8 +1968,10 @@
             const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
 
             const reutilizarArchivo = !archivoActualB64 && debeReutilizarArchivo(texto);
-            const archivoPayload = archivoActualB64 || (reutilizarArchivo ? ultimoArchivoContexto?.base64 : null);
-            const mimePayload = mimeTypeActual || (reutilizarArchivo ? ultimoArchivoContexto?.mimeType : null);
+            const documentoPayload = reutilizarArchivo && ultimoDocumentoContexto?.chatId === chatActualId ? (ultimoDocumentoContexto.textoExtraido || ultimoDocumentoContexto.resumen || '') : '';
+            const usarArchivoBruto = archivoActualB64 || (reutilizarArchivo && !documentoPayload);
+            const archivoPayload = archivoActualB64 || (reutilizarArchivo && !documentoPayload ? ultimoArchivoContexto?.base64 : null);
+            const mimePayload = mimeTypeActual || (reutilizarArchivo && !documentoPayload ? ultimoArchivoContexto?.mimeType : null);
 
             let textoVisible = texto;
             if (archivoPayload) textoVisible = `<span class="adjunto-badge">📎 Archivo Adjunto</span>` + textoVisible;
@@ -2052,8 +2089,19 @@
             }
         }
 
-        function formatearTextoIA(texto) {
-            let html = texto || '';
+        function normalizarTextoTecnico(texto) {
+    let t = (texto || '').toString();
+    t = t.replace(/\\\[/g, '').replace(/\\\]/g, '');
+    t = t.replace(/\\\(/g, '').replace(/\\\)/g, '');
+    t = t.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '$1/$2');
+    t = t.replace(/\\times/g, '×').replace(/\\cdot/g, '·');
+    t = t.replace(/\\pi/g, 'π');
+    t = t.replace(/\\sqrt\{([^{}]+)\}/g, '√($1)');
+    return t;
+}
+
+function formatearTextoIA(texto) {
+            let html = normalizarTextoTecnico(texto || '');
             html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre style="background:rgba(0,0,0,0.35); padding:12px; border-radius:12px; overflow:auto; border:1px solid rgba(255,255,255,0.08); margin:8px 0;"><code>${code.trim()}</code></pre>`);
             html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
