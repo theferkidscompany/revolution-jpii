@@ -619,6 +619,40 @@
                 </div>
 
                 <div class="config-group">
+                    <button class="icon-tool" id="btn-complejidad" type="button" title="Cambiar complejidad">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h16"></path><path d="M6 14l3-4 4 3 5-6"></path><circle cx="6" cy="14" r="1.5"></circle><circle cx="9" cy="10" r="1.5"></circle><circle cx="13" cy="13" r="1.5"></circle><circle cx="18" cy="7" r="1.5"></circle></svg>
+                        <span class="icon-status" id="complejidad-indicador">A</span>
+                    </button>
+                    <div class="config-popover" id="popover-complejidad">
+                        <div class="popover-title">Complejidad de respuesta</div>
+                        <div class="config-options">
+                            <button class="config-chip" type="button" data-complexity-value="auto">
+                                <span class="config-chip-emoji">🪄</span>
+                                <span class="config-chip-text"><strong>Auto</strong><span>Fénix decide la longitud según el mensaje.</span></span>
+                            </button>
+                            <button class="config-chip" type="button" data-complexity-value="simple">
+                                <span class="config-chip-emoji">⚡</span>
+                                <span class="config-chip-text"><strong>Simple</strong><span>Máxima síntesis y rapidez.</span></span>
+                            </button>
+                            <button class="config-chip" type="button" data-complexity-value="normal">
+                                <span class="config-chip-emoji">⚖️</span>
+                                <span class="config-chip-text"><strong>Normal</strong><span>Equilibrio entre brevedad y detalle.</span></span>
+                            </button>
+                            <button class="config-chip" type="button" data-complexity-value="detallada">
+                                <span class="config-chip-emoji">📘</span>
+                                <span class="config-chip-text"><strong>Detallada</strong><span>Más desarrollo cuando haga falta.</span></span>
+                            </button>
+                        </div>
+                    </div>
+                    <select id="select-complejidad" class="visually-hidden-select" title="Complejidad de la respuesta">
+                        <option value="auto">Auto</option>
+                        <option value="simple">Simple</option>
+                        <option value="normal" selected>Normal</option>
+                        <option value="detallada">Detallada</option>
+                    </select>
+                </div>
+
+                <div class="config-group">
                     <button class="icon-tool" id="btn-memoria" type="button" title="Configurar memoria">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v4l3 3"></path><circle cx="12" cy="12" r="9"></circle></svg>
                         <span class="icon-status" id="memoria-indicador">N</span>
@@ -1051,6 +1085,7 @@
             btnMenu: document.getElementById('btn-menu-mobile'),
             selectTemperamento: document.getElementById('select-temperamento'),
             selectMemoria: document.getElementById('select-memoria'),
+            selectComplejidad: document.getElementById('select-complejidad'),
             btnEnviar: document.getElementById('btn-enviar'),
             btnAdjuntar: document.getElementById('btn-adjuntar'),
             btnSugerencia: document.getElementById('btn-sugerencia'),
@@ -1059,12 +1094,15 @@
             btnModo: document.getElementById('btn-modo'),
             btnMemoria: document.getElementById('btn-memoria'),
             btnAlgoritmo: document.getElementById('btn-algoritmo'),
+            btnComplejidad: document.getElementById('btn-complejidad'),
             popoverModo: document.getElementById('popover-modo'),
             popoverMemoria: document.getElementById('popover-memoria'),
             popoverAlgoritmo: document.getElementById('popover-algoritmo'),
+            popoverComplejidad: document.getElementById('popover-complejidad'),
             modoIndicador: document.getElementById('modo-indicador'),
             memoriaIndicador: document.getElementById('memoria-indicador'),
             algoritmoIndicador: document.getElementById('algoritmo-indicador'),
+            complejidadIndicador: document.getElementById('complejidad-indicador'),
             tycModal: document.getElementById('tyc-modal'),
             btnAceptarTyC: document.getElementById('btn-aceptar-tyc'),
             btnRechazarTyC: document.getElementById('btn-rechazar-tyc'),
@@ -1130,11 +1168,20 @@
             investigador: { badge: 'W', label: 'Buscar más' }
         };
 
+        const COMPLEJIDAD_META = {
+            auto: { badge: 'A', label: 'Auto' },
+            simple: { badge: 'S', label: 'Simple' },
+            normal: { badge: 'N', label: 'Normal' },
+            detallada: { badge: 'D', label: 'Detallada' }
+        };
+
         let perfilAcademicoActual = null;
         let algoritmoActual = 'equilibrado';
+        let complejidadActual = 'auto';
         let perfilTemporalSeleccionado = 'secundaria';
         let modoManualFijo = 'politico';
         let memoriaManualFija = 'normal';
+        let complejidadManualFija = 'normal';
 
         let preferenciasActuales = {
             ciudad: 'Zarumilla, Perú',
@@ -1144,12 +1191,14 @@
             autoMode: true,
             autoMemory: true,
             bilingualTouch: true,
-            deepSearch: false
+            deepSearch: false,
+            autoComplexity: true
         };
         let ultimaDecisionIA = {
             modo: 'auto',
             memoria: 'auto',
             algoritmo: 'equilibrado',
+            complejidad: 'auto',
             nota: 'Thinking profile ready · Fénix se adapta con estilo humano.'
         };
         const ADMIN_EMAILS = ['theferkidscompany@gmail.com'];
@@ -1158,9 +1207,11 @@
             DOM.popoverModo.classList.remove('open');
             DOM.popoverMemoria.classList.remove('open');
             DOM.popoverAlgoritmo.classList.remove('open');
+            DOM.popoverComplejidad.classList.remove('open');
             DOM.btnModo.classList.remove('is-open');
             DOM.btnMemoria.classList.remove('is-open');
             DOM.btnAlgoritmo.classList.remove('is-open');
+            DOM.btnComplejidad.classList.remove('is-open');
         }
 
         function nombrePerfilBonito(perfil) {
@@ -1275,6 +1326,21 @@
             return 'normal';
         }
 
+        function detectarComplejidadAutomatica(texto) {
+            const t = (texto || '').toLowerCase();
+            const palabras = (t.trim().match(/\S+/g) || []).length;
+            if (/solo la clave|solo clave|solo respuesta|solo resultado|breve|corto|resumid|simple|al grano|una frase|30 palabras/.test(t) || palabras <= 8) return 'simple';
+            if (/detall|desarrolla|eje por eje|discurso|guion|clase completa|analiza|explica completo|paso a paso|amplia|ampliar/.test(t)) return 'detallada';
+            return 'normal';
+        }
+
+        function debeReutilizarDocumento(texto) {
+            const t = (texto || '').toLowerCase();
+            if (!ultimoDocumentoContexto || ultimoDocumentoContexto.chatId !== chatActualId) return false;
+            if (Date.now() - (ultimoDocumentoContexto.timestamp || 0) > 1000 * 60 * 20) return false;
+            return /clave|alternativa|respuesta|resuelve|resu[eé]lv|explicame|explica|solo la|solo dame|opcion|opción|adjunto|archivo|pregunta|traduce|pásalo limpio|pasalo limpio|resultado/.test(t);
+        }
+
 
         function debeReutilizarArchivo(texto) {
             const t = (texto || '').toLowerCase();
@@ -1307,15 +1373,17 @@
             const modo = ultimaDecisionIA.modo || DOM.selectTemperamento.value || 'politico';
             const memoria = ultimaDecisionIA.memoria || DOM.selectMemoria.value || 'normal';
             const algoritmo = ultimaDecisionIA.algoritmo || algoritmoActual || 'equilibrado';
+            const complejidad = ultimaDecisionIA.complejidad || DOM.selectComplejidad.value || 'auto';
             DOM.statusModePill.textContent = `${MODO_META[modo]?.emoji || '🤖'} ${MODO_META[modo]?.label || 'Modo'}`;
             DOM.statusMemoryPill.textContent = `${memoria === 'corta' ? '⚡' : memoria === 'profunda' ? '🚀' : '💾'} ${MEMORIA_META[memoria]?.label || 'Memoria'}`;
             DOM.statusAlgorithmPill.textContent = `${algoritmo === 'breve' ? '✂️' : algoritmo === 'profesor' ? '🎓' : algoritmo === 'investigador' ? '🌐' : '⚖️'} ${ALGORITMO_META[algoritmo]?.label || 'Equilibrado'}`;
-            DOM.statusAutoNote.textContent = ultimaDecisionIA.nota || 'Perfil listo · Fénix se adapta al contexto sin forzar cambios.';
+            DOM.statusAutoNote.textContent = `${ultimaDecisionIA.nota || 'Perfil listo · Fénix se adapta con estilo humano.'} · ${COMPLEJIDAD_META[complejidad]?.label || 'Auto'}`;
         }
 
         async function aplicarAutomatizacionAntesDeEnviar(texto) {
             let modo = DOM.selectTemperamento.value || 'auto';
             let memoria = DOM.selectMemoria.value || 'auto';
+            let complejidad = DOM.selectComplejidad.value || 'auto';
             const algoritmo = algoritmoActual || 'equilibrado';
 
             if (preferenciasActuales.autoMode) {
@@ -1334,11 +1402,20 @@
                 DOM.selectMemoria.value = memoria;
             }
 
+            if (preferenciasActuales.autoComplexity) {
+                complejidad = detectarComplejidadAutomatica(texto);
+                DOM.selectComplejidad.value = complejidad;
+            } else if (complejidad === 'auto') {
+                complejidad = complejidadManualFija || 'normal';
+                DOM.selectComplejidad.value = complejidad;
+            }
+
             ultimaDecisionIA = {
                 modo,
                 memoria,
+                complejidad,
                 algoritmo,
-                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual fijo'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual fija'} · ${preferenciasActuales.deepSearch ? 'Web profunda activa' : 'Web profunda apagada'}`
+                nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual fijo'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual fija'} · ${preferenciasActuales.autoComplexity ? 'Complejidad automática' : 'Complejidad manual'} · ${preferenciasActuales.deepSearch ? 'Web profunda activa' : 'Web profunda apagada'}`
             };
 
             actualizarUIConfig();
@@ -1417,12 +1494,15 @@
         function actualizarUIConfig() {
             const modo = DOM.selectTemperamento.value || 'auto';
             const memoria = DOM.selectMemoria.value || 'auto';
+            const complejidad = DOM.selectComplejidad.value || 'auto';
 
             DOM.modoIndicador.textContent = MODO_META[modo]?.emoji || '✨';
             DOM.memoriaIndicador.textContent = MEMORIA_META[memoria]?.badge || 'A';
+            DOM.complejidadIndicador.textContent = COMPLEJIDAD_META[complejidad]?.badge || 'A';
             DOM.algoritmoIndicador.textContent = ALGORITMO_META[algoritmoActual]?.badge || 'A';
             DOM.btnModo.setAttribute('aria-label', MODO_META[modo]?.label || 'Modo');
             DOM.btnMemoria.setAttribute('aria-label', MEMORIA_META[memoria]?.label || 'Memoria');
+            DOM.btnComplejidad.setAttribute('aria-label', COMPLEJIDAD_META[complejidad]?.label || 'Complejidad');
             DOM.btnAlgoritmo.setAttribute('aria-label', ALGORITMO_META[algoritmoActual]?.label || 'Algoritmo');
 
             document.querySelectorAll('[data-mode-value]').forEach((btn) => {
@@ -1430,6 +1510,9 @@
             });
             document.querySelectorAll('[data-memory-value]').forEach((btn) => {
                 btn.classList.toggle('active', btn.dataset.memoryValue === (preferenciasActuales.autoMemory ? 'auto' : memoria));
+            });
+            document.querySelectorAll('[data-complexity-value]').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.complexityValue === (preferenciasActuales.autoComplexity ? 'auto' : complejidad));
             });
             document.querySelectorAll('[data-algorithm-value]').forEach((btn) => {
                 btn.classList.toggle('active', btn.dataset.algorithmValue === algoritmoActual);
@@ -1475,6 +1558,21 @@
             DOM.selectMemoria.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
+        function aplicarComplejidad(valor, manual = false) {
+            if (valor === 'auto') {
+                preferenciasActuales.autoComplexity = true;
+                DOM.selectComplejidad.value = detectarComplejidadAutomatica(DOM.input.value || '') || 'normal';
+                actualizarUIConfig();
+                return;
+            }
+            DOM.selectComplejidad.value = valor;
+            if (manual) {
+                preferenciasActuales.autoComplexity = false;
+                complejidadManualFija = valor;
+            }
+            actualizarUIConfig();
+        }
+
         function obtenerLimiteMemoria() {
             switch (DOM.selectMemoria.value) {
                 case 'corta':
@@ -1495,6 +1593,7 @@
                     configFenix: {
                         modo: DOM.selectTemperamento.value,
                         memoria: DOM.selectMemoria.value,
+                        complejidad: DOM.selectComplejidad.value,
                         algoritmo: algoritmoActual
                     },
                     preferenciasFenix: preferenciasActuales
@@ -1511,10 +1610,11 @@
                 const snap = await getDoc(doc(db, 'usuarios', userActual.uid));
                 const cfg = snap.exists() && snap.data().configFenix
                     ? snap.data().configFenix
-                    : { modo: 'politico', memoria: 'normal', algoritmo: 'equilibrado' };
+                    : { modo: 'politico', memoria: 'normal', complejidad: 'auto', algoritmo: 'equilibrado' };
 
                 DOM.selectTemperamento.value = cfg.modo || 'politico';
                 DOM.selectMemoria.value = cfg.memoria || 'normal';
+                DOM.selectComplejidad.value = cfg.complejidad || 'auto';
                 algoritmoActual = cfg.algoritmo || 'equilibrado';
                 perfilAcademicoActual = snap.exists() ? (snap.data().perfilAcademico || null) : null;
                 preferenciasActuales = snap.exists() && snap.data().preferenciasFenix
@@ -1523,9 +1623,11 @@
                 if (perfilAcademicoActual?.rol) perfilTemporalSeleccionado = perfilAcademicoActual.rol;
                 if (!preferenciasActuales.autoMode && cfg.modo && cfg.modo !== 'auto') modoManualFijo = cfg.modo;
                 if (!preferenciasActuales.autoMemory && cfg.memoria && cfg.memoria !== 'auto') memoriaManualFija = cfg.memoria;
+                if (!preferenciasActuales.autoComplexity && cfg.complejidad && cfg.complejidad !== 'auto') complejidadManualFija = cfg.complejidad;
             } catch (e) {
                 DOM.selectTemperamento.value = 'politico';
                 DOM.selectMemoria.value = 'normal';
+                DOM.selectComplejidad.value = 'auto';
                 algoritmoActual = 'equilibrado';
                 perfilAcademicoActual = null;
             }
@@ -1651,6 +1753,16 @@
             }
         });
 
+        DOM.btnComplejidad.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const willOpen = !DOM.popoverComplejidad.classList.contains('open');
+            cerrarPopoversConfiguracion();
+            if (willOpen) {
+                DOM.popoverComplejidad.classList.add('open');
+                DOM.btnComplejidad.classList.add('is-open');
+            }
+        });
+
         DOM.btnAlgoritmo.addEventListener('click', (e) => {
             e.stopPropagation();
             const willOpen = !DOM.popoverAlgoritmo.classList.contains('open');
@@ -1681,6 +1793,14 @@
             btn.addEventListener('click', async () => {
                 algoritmoActual = btn.dataset.algorithmValue;
                 actualizarUIConfig();
+                await guardarConfiguracionUsuario();
+                cerrarPopoversConfiguracion();
+            });
+        });
+
+        document.querySelectorAll('[data-complexity-value]').forEach((btn) => {
+            btn.addEventListener('click', async () => {
+                aplicarComplejidad(btn.dataset.complexityValue, true);
                 await guardarConfiguracionUsuario();
                 cerrarPopoversConfiguracion();
             });
@@ -1943,13 +2063,36 @@
             const file = this.files[0];
             if(!file) return;
             if(file.size > 5 * 1024 * 1024) { alert("El archivo es muy pesado (Máx 5MB)."); return; }
+
+            const isTextFile = file.type.startsWith('text/') || file.name.toLowerCase().endsWith('.txt');
+            const isPdfFile = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
             const reader = new FileReader();
-            reader.onload = (e) => {
-                archivoActualB64 = e.target.result; mimeTypeActual = file.type;
-                document.getElementById('texto-archivo').innerText = "📎 " + file.name;
+
+            reader.onload = async (e) => {
+                mimeTypeActual = file.type || (isTextFile ? 'text/plain' : 'application/octet-stream');
+
+                if (isTextFile) {
+                    const textoPlano = (e.target.result || '').toString().trim();
+                    archivoActualB64 = null;
+                    registrarDocumentoContexto(textoPlano, textoPlano.slice(0, 220));
+                    document.getElementById('texto-archivo').innerText = "📄 " + file.name;
+                } else if (isPdfFile) {
+                    archivoActualB64 = e.target.result;
+                    document.getElementById('texto-archivo').innerText = "📎 " + file.name;
+                    // El PDF se procesará en el backend si el motor lo soporta.
+                } else {
+                    archivoActualB64 = e.target.result;
+                    document.getElementById('texto-archivo').innerText = "🖼️ " + file.name;
+                }
+
                 document.getElementById('preview-archivo').style.display = 'flex';
             };
-            reader.readAsDataURL(file);
+
+            if (isTextFile) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsDataURL(file);
+            }
         });
 
         document.getElementById('btn-quitar-archivo').addEventListener('click', () => {
@@ -1979,8 +2122,10 @@
             const refMensajes = collection(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes`);
             const refChatPrincipal = doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}`);
 
+            const tieneDocumentoPrevio = ultimoDocumentoContexto?.chatId === chatActualId;
             const reutilizarArchivo = !archivoActualB64 && debeReutilizarArchivo(texto);
-            const documentoPayload = reutilizarArchivo && ultimoDocumentoContexto?.chatId === chatActualId ? (ultimoDocumentoContexto.textoExtraido || ultimoDocumentoContexto.resumen || '') : '';
+            const reutilizarDocumento = !archivoActualB64 && debeReutilizarDocumento(texto) && tieneDocumentoPrevio;
+            const documentoPayload = (reutilizarArchivo || reutilizarDocumento) && tieneDocumentoPrevio ? (ultimoDocumentoContexto.textoExtraido || ultimoDocumentoContexto.resumen || '') : '';
             const usarArchivoBruto = archivoActualB64 || (reutilizarArchivo && !documentoPayload);
             const archivoPayload = archivoActualB64 || (reutilizarArchivo && !documentoPayload ? ultimoArchivoContexto?.base64 : null);
             const mimePayload = mimeTypeActual || (reutilizarArchivo && !documentoPayload ? ultimoArchivoContexto?.mimeType : null);
@@ -2014,7 +2159,8 @@
                     nombre: userActual?.displayName || document.getElementById('nombre-ui').innerText || '',
                     email: userActual?.email || ''
                 },
-                modoManual: !preferenciasActuales.autoMode
+                modoManual: !preferenciasActuales.autoMode,
+                complejidad: DOM.selectComplejidad.value
             };
 
             if (archivoPayload) {
@@ -2025,6 +2171,13 @@
                     registrarArchivoContexto(archivoActualB64, mimeTypeActual, document.getElementById('texto-archivo').innerText || 'archivo');
                     document.getElementById('btn-quitar-archivo').click();
                 }
+            }
+
+            if (documentoPayload) {
+                payload.documentContext = {
+                    textoExtraido: documentoPayload,
+                    resumen: documentoPayload.slice(0, 260)
+                };
             }
 
             iaEstaPensando = true;
@@ -2068,10 +2221,15 @@
                     ultimaDecisionIA = {
                         modo: data.modoAplicado,
                         memoria: DOM.selectMemoria.value,
+                        complejidad: data.complejidadAplicada || DOM.selectComplejidad.value,
                         algoritmo: algoritmoActual,
-                        nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual'} · ${data.motor || 'Motor listo'}`
+                        nota: `${preferenciasActuales.autoMode ? 'Modo automático' : 'Modo manual'} · ${preferenciasActuales.autoMemory ? 'Memoria automática' : 'Memoria manual'} · ${preferenciasActuales.autoComplexity ? 'Complejidad automática' : 'Complejidad manual'} · ${data.motor || 'Motor listo'}`
                     };
                     refrescarStatusIA();
+                }
+
+                if (data.documentContext?.textoExtraido || data.documentContext?.resumen) {
+                    registrarDocumentoContexto(data.documentContext.textoExtraido, data.documentContext.resumen);
                 }
 
                 if (data.respuesta) {
