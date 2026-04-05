@@ -1132,6 +1132,7 @@
         let mimeTypeActual = null;
         let ultimoArchivoContexto = null;
         let ultimoDocumentoContexto = null;
+        let memoriaPersonalActual = [];
         
         // VARIABLES DE CONTROL DE ESTADO DE IA
         let controladorPeticion = null;
@@ -1246,6 +1247,74 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
+
+        function normalizarMemoriaPersonal(items = []) {
+            return (Array.isArray(items) ? items : [])
+                .map((item) => {
+                    if (typeof item === 'string') return { texto: item.trim(), creadaEn: '' };
+                    return {
+                        texto: (item?.texto || item?.contenido || '').toString().trim(),
+                        creadaEn: (item?.creadaEn || '').toString()
+                    };
+                })
+                .filter((item) => item.texto)
+                .slice(0, 12);
+        }
+
+        function extraerMemoriaPersonalDesdeMensaje(texto) {
+            const bruto = (texto || '').trim();
+            if (!bruto) return '';
+
+            const patrones = [
+                /^(?:guarda|recuerda|memoriza|anota|ten en cuenta)(?:\s+esto)?(?:\s+en\s+tu\s+memoria)?\s*[:,-]\s*(.+)$/i,
+                /^(?:acuerdate|acu[eé]rdate)(?:\s+de\s+esto)?(?:\s+para\s+la\s+pr[oó]xima)?\s*[:,-]\s*(.+)$/i
+            ];
+
+            for (const patron of patrones) {
+                const match = bruto.match(patron);
+                if (match?.[1]) return match[1].trim();
+            }
+
+            return '';
+        }
+
+        async function guardarMemoriaPersonal(texto) {
+            const limpio = (texto || '').trim();
+            if (!userActual || !limpio) return false;
+
+            const nuevaEntrada = {
+                texto: limpio.slice(0, 280),
+                creadaEn: new Date().toISOString()
+            };
+
+            memoriaPersonalActual = [
+                nuevaEntrada,
+                ...memoriaPersonalActual.filter((item) => (item?.texto || '').toLowerCase() !== nuevaEntrada.texto.toLowerCase())
+            ].slice(0, 12);
+
+            try {
+                await setDoc(doc(db, 'usuarios', userActual.uid), {
+                    memoriaPersonal: {
+                        items: memoriaPersonalActual,
+                        actualizadoEn: serverTimestamp()
+                    }
+                }, { merge: true });
+                return true;
+            } catch (error) {
+                console.warn('No se pudo guardar la memoria personal.', error);
+                return false;
+            }
+        }
+
+        function esSeguimientoDeAdjunto(texto) {
+            const t = (texto || '').trim().toLowerCase();
+            if (!t) return false;
+
+            const palabras = (t.match(/\S+/g) || []).length;
+            const esCortoReferencial = palabras <= 6 && /^(y|ahora|entonces|eso|esa|ese|ahi|ahí|alli|allí|asi|así|ya|uff|mmm|ok|oka)\b/.test(t);
+
+            return esCortoReferencial || /paso a paso|desarrolla|continua|continúa|interpreta|analiza|tono|fria|fría|se[nñ]ales|interes|interés|distancia|transcribe|explica mejor|explica|justifica|como sale|cómo sale|de donde sale|de dónde sale|que ves|qué ves|que opinas|qué opinas|quien esta|quién está|resumen|detalle|otra vez/.test(t);
+        }
 
         function esEntornoMovil() {
             return window.matchMedia('(max-width: 768px)').matches || /android|iphone|ipad|ipod/i.test(navigator.userAgent || '');
@@ -1539,18 +1608,16 @@
         }
 
         function debeReutilizarDocumento(texto) {
-            const t = (texto || '').toLowerCase();
             if (!ultimoDocumentoContexto || ultimoDocumentoContexto.chatId !== chatActualId) return false;
             if (Date.now() - (ultimoDocumentoContexto.timestamp || 0) > 1000 * 60 * 20) return false;
-            return /clave|alternativa|respuesta|resuelve|resu[eé]lv|explicame|explica|solo la|solo dame|opcion|opción|adjunto|archivo|pregunta|traduce|pásalo limpio|pasalo limpio|resultado/.test(t);
+            return esSeguimientoDeAdjunto(texto);
         }
 
 
         function debeReutilizarArchivo(texto) {
-            const t = (texto || '').toLowerCase();
             if (!ultimoArchivoContexto || ultimoArchivoContexto.chatId !== chatActualId) return false;
             if (Date.now() - (ultimoArchivoContexto.timestamp || 0) > 1000 * 60 * 20) return false;
-            return /clave|alternativa|respuesta|resuelve|resuelvelo|resu[eé]lv|explicame|expl[ií]ca|solo la|solo dame|opcion|opción|adjunto|archivo|pregunta/.test(t);
+            return esSeguimientoDeAdjunto(texto);
         }
 
         function registrarArchivoContexto(base64, mimeType, nombre) {
@@ -1977,6 +2044,7 @@
                 preferenciasActuales = snap.exists() && snap.data().preferenciasFenix
                     ? { ...preferenciasActuales, ...snap.data().preferenciasFenix }
                     : preferenciasActuales;
+                memoriaPersonalActual = snap.exists() ? normalizarMemoriaPersonal(snap.data().memoriaPersonal?.items || []) : [];
                 if (perfilAcademicoActual?.rol) perfilTemporalSeleccionado = perfilAcademicoActual.rol;
                 if (!preferenciasActuales.autoMode && cfg.modo && cfg.modo !== 'auto') modoManualFijo = cfg.modo;
                 if (!preferenciasActuales.autoMemory && cfg.memoria && cfg.memoria !== 'auto') memoriaManualFija = cfg.memoria;
@@ -1987,6 +2055,7 @@
                 DOM.selectComplejidad.value = 'auto';
                 algoritmoActual = 'equilibrado';
                 perfilAcademicoActual = null;
+                memoriaPersonalActual = [];
             }
 
             actualizarUIConfig();
@@ -2322,6 +2391,9 @@
                 chatActualId = null;
                 chatHistorialLocal = [];
                 mensajesChatActual = [];
+                memoriaPersonalActual = [];
+                ultimoDocumentoContexto = null;
+                ultimoArchivoContexto = null;
                 DOM.app.style.display = 'none';
                 DOM.login.style.display = 'flex';
                 DOM.btnAdminPanel.style.display = 'none';
@@ -2411,6 +2483,8 @@
             chatActualId = idChat;
             chatHistorialLocal = [];
             mensajesChatActual = [];
+            ultimoDocumentoContexto = null;
+            ultimoArchivoContexto = null;
             document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
             if(window.innerWidth <= 768) { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; }
             
@@ -2432,6 +2506,9 @@
                         const data = docSnap.data();
                         mensajesChatActual.push({ id: docSnap.id, ...data });
                         chatHistorialLocal.push({ emisor: data.emisor, texto: data.texto });
+                        if (data?.metadata?.documentContext?.textoExtraido || data?.metadata?.documentContext?.resumen) {
+                            registrarDocumentoContexto(data.metadata.documentContext.textoExtraido, data.metadata.documentContext.resumen);
+                        }
                         renderizarMensaje(data.texto, data.emisor, data, docSnap.id);
                     });
                     scrollAbajo();
@@ -2512,6 +2589,11 @@
             if (texto === '' && !archivoActualB64) return;
             DOM.input.value = '';
 
+            const memoriaDetectada = extraerMemoriaPersonalDesdeMensaje(texto);
+            if (memoriaDetectada) {
+                await guardarMemoriaPersonal(memoriaDetectada);
+            }
+
             await aplicarAutomatizacionAntesDeEnviar(texto);
 
             if (!chatActualId) {
@@ -2560,7 +2642,8 @@
                     email: userActual?.email || ''
                 },
                 modoManual: !preferenciasActuales.autoMode,
-                complejidad: DOM.selectComplejidad.value
+                complejidad: DOM.selectComplejidad.value,
+                memoriaPersonal: memoriaPersonalActual
             };
 
             if (archivoPayload) {
@@ -2659,7 +2742,8 @@
                             complejidadAplicada: data.complejidadAplicada || '',
                             algoritmo: algoritmoActual || '',
                             requiereGoogle: !!data.requiereGoogle,
-                            errorTecnico: !!data.errorTecnico
+                            errorTecnico: !!data.errorTecnico,
+                            documentContext: data.documentContext || null
                         },
                         feedback: null
                     });
@@ -2843,4 +2927,3 @@ function formatearTextoIA_legado(texto) {
     </script>
 </body>
 </html>
-
