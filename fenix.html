@@ -397,10 +397,18 @@
             opacity: 0;
             pointer-events: none;
             transition: 0.2s;
+            flex-wrap: wrap;
         }
         .fila-msg.ia:hover .assistant-mini-tools {
             opacity: 1;
             pointer-events: auto;
+        }
+        .assistant-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 85%;
+            min-width: 0;
         }
         .mini-tool {
             border: 1px solid rgba(255,255,255,0.08);
@@ -416,6 +424,53 @@
             border-color: rgba(0, 229, 255, 0.22);
             color: var(--accent);
             background: rgba(0, 229, 255, 0.08);
+        }
+        .mini-tool.active {
+            border-color: rgba(0, 229, 255, 0.32);
+            color: var(--accent);
+            background: rgba(0, 229, 255, 0.14);
+        }
+        .mini-tool.negative.active {
+            border-color: rgba(255, 68, 68, 0.3);
+            color: #ffb3b3;
+            background: rgba(255, 68, 68, 0.14);
+        }
+        .mini-tool:disabled {
+            opacity: 0.55;
+            cursor: default;
+        }
+        .assistant-feedback-state {
+            margin-top: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .feedback-chip-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .feedback-chip {
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: var(--text-main);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .feedback-chip:hover,
+        .feedback-chip.active {
+            border-color: rgba(0, 229, 255, 0.26);
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--accent);
+        }
+        .feedback-meta {
+            margin-top: 10px;
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.45;
         }
 
         @media (max-width: 768px) {
@@ -434,6 +489,7 @@
             .status-strip { justify-content: flex-start; overflow-x: auto; padding: 8px 12px; }
             .status-strip-note { max-width: 60vw; }
             .admin-kpi-grid { grid-template-columns: 1fr 1fr; }
+            .assistant-mini-tools { opacity: 1; pointer-events: auto; }
         }
 
         /* ================= AUTHENTICATION (LOGIN/REGISTRO) ================= */
@@ -464,7 +520,10 @@
         .divider span.line { height: 1px; background: rgba(255,255,255,0.1); flex: 1; }
         .divider span.text { color: #555; font-size: 11px; margin: 0 10px; letter-spacing: 1px; }
         .error-msg { color: var(--danger); font-size: 13px; display: none; margin-top: 15px; padding: 10px; background: rgba(255, 68, 68, 0.1); border-radius: 8px; border: 1px solid rgba(255, 68, 68, 0.3); }
-        
+        .auth-hint { margin-top: 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.03); color: var(--text-muted); font-size: 12px; line-height: 1.5; text-align: left; }
+        .auth-hint strong { color: var(--accent); }
+        .auth-hint code { background: rgba(0,229,255,0.08); color: var(--accent); padding: 2px 6px; border-radius: 6px; font-family: Consolas, monospace; }
+
         #verify-screen { display: none; flex-direction: column; align-items: center; animation: fadeIn 0.5s; padding: 20px 0; }
         .mail-icon { font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--glow)); }
 
@@ -511,7 +570,7 @@
         .fila-msg.user { justify-content: flex-end; }
         .avatar-ia { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--accent); object-fit: cover; box-shadow: 0 0 10px var(--glow); flex-shrink: 0; }
         
-        .burbuja { padding: 14px 20px; font-size: 15px; line-height: 1.6; max-width: 85%; letter-spacing: 0.3px; word-wrap: break-word;}
+        .burbuja { padding: 14px 20px; font-size: 15px; line-height: 1.6; max-width: 100%; letter-spacing: 0.3px; word-wrap: break-word;}
         .burbuja.user { background: linear-gradient(135deg, var(--accent-dark), var(--accent)); color: #fff; border-radius: 20px 20px 4px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: 500; }
         .burbuja.ia { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); color: var(--text-main); border-radius: 4px 20px 20px 20px; backdrop-filter: blur(10px); }
         .burbuja.sistema { background: rgba(255, 68, 68, 0.1); border: 1px solid rgba(255, 68, 68, 0.3); color: #ffcccc; font-style: italic;}
@@ -906,7 +965,7 @@
                 <div class="login-header">
                     <img src="fenix-logo.jpg" alt="Logo" onerror="this.style.display='none'">
                     <h2>Fénix IA</h2>
-                    <p>Acceso Seguro Estudiantil</p>
+                    <p>Acceso Seguro</p>
                 </div>
 
                 <div class="auth-tabs">
@@ -927,6 +986,7 @@
                             <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
                         </svg> Google
                     </button>
+                    <div id="google-auth-hint" class="auth-hint">Accede con Google o con tu correo. Fénix mantendrá tu historial y tu configuración listos.</div>
                 </div>
 
                 <div id="form-register" class="auth-form">
@@ -990,7 +1050,7 @@
         <div class="chat-area">
             <div class="mensajes-container" id="contenedor-mensajes">
                 <div class="bienvenida" id="bienvenida-msg">
-                    <img src="fenix-logo.jpg" alt="Fenix" onerror="this.style.display='none'">
+                    <img src="fenix-logo.jpg" alt="Fénix" onerror="this.style.display='none'">
                     <h2 id="texto-bienvenida">Hola, soy Fénix. ¿Listo para la Revolución?</h2>
                 </div>
             </div>
@@ -1023,9 +1083,30 @@
         </div>
     </div>
 
+    <div id="feedback-modal" class="modal-overlay">
+        <div class="modal-box" style="width:min(92vw, 540px);">
+            <h3 id="feedback-modal-title">Feedback para Fénix</h3>
+            <p id="feedback-modal-subtitle">Marca qué estuvo bien o qué falló para que Fénix mejore de verdad.</p>
+
+            <div id="feedback-chip-grid" class="feedback-chip-grid"></div>
+
+            <div class="settings-field full" style="margin-top:14px;">
+                <label class="settings-label" for="feedback-textarea">Detalle opcional</label>
+                <textarea id="feedback-textarea" class="input-form settings-textarea" placeholder="Ejemplo: estuvo claro, fue muy largo, no entendió el archivo o faltó verificar en web..."></textarea>
+            </div>
+
+            <div id="feedback-meta" class="feedback-meta">Tu feedback se guardará junto al mensaje para mejorar calidad, tono y motor.</div>
+
+            <div class="modal-actions">
+                <button class="btn-full btn-primary" id="btn-enviar-feedback" style="margin:0;">Enviar feedback</button>
+                <button class="btn-full btn-secondary" id="btn-cerrar-feedback" style="margin:0;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -1038,12 +1119,14 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
 
         let userActual = null;
         let chatActualId = null; 
         let unsubscribeMensajes = null; 
         let unsubscribeLista = null;
         let chatHistorialLocal = [];
+        let mensajesChatActual = [];
         
         let archivoActualB64 = null;
         let mimeTypeActual = null;
@@ -1056,6 +1139,8 @@
 
         const RUTA_LOGO = "fenix-logo.jpg";
         const URL_RENDER = "https://fenix-backend-uqbg.onrender.com/api/chat";
+        const URL_FEEDBACK = URL_RENDER.replace('/api/chat', '/api/feedback');
+        const URL_ADMIN = URL_RENDER.replace('/api/chat', '/api/admin/resumen');
 
         const frasesBienvenida = [
             "Hola campeón, soy Fénix. ¿Listo para la Revolución?",
@@ -1141,10 +1226,116 @@
             adminKpiAlertas: document.getElementById('admin-kpi-alertas'),
             adminKpiFeedback: document.getElementById('admin-kpi-feedback'),
             adminKpiChats: document.getElementById('admin-kpi-chats'),
-            adminKpiModelo: document.getElementById('admin-kpi-modelo')
+            adminKpiModelo: document.getElementById('admin-kpi-modelo'),
+            googleAuthHint: document.getElementById('google-auth-hint'),
+            feedbackModal: document.getElementById('feedback-modal'),
+            feedbackModalTitle: document.getElementById('feedback-modal-title'),
+            feedbackModalSubtitle: document.getElementById('feedback-modal-subtitle'),
+            feedbackChipGrid: document.getElementById('feedback-chip-grid'),
+            feedbackTextarea: document.getElementById('feedback-textarea'),
+            feedbackMeta: document.getElementById('feedback-meta'),
+            btnEnviarFeedback: document.getElementById('btn-enviar-feedback'),
+            btnCerrarFeedback: document.getElementById('btn-cerrar-feedback')
         };
 
         const showError = (msg) => { DOM.error.innerText = msg; DOM.error.style.display = 'block'; };
+        const clearError = () => { DOM.error.innerText = ''; DOM.error.style.display = 'none'; };
+        const escapeHtml = (texto) => (texto || '').toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        function esEntornoMovil() {
+            return window.matchMedia('(max-width: 768px)').matches || /android|iphone|ipad|ipod/i.test(navigator.userAgent || '');
+        }
+
+        function obtenerInfoOrigenActual() {
+            const host = window.location.hostname || '';
+            const origin = window.location.origin || `${window.location.protocol}//${window.location.host}`;
+            const esArchivoLocal = window.location.protocol === 'file:';
+            const esIp = /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host);
+            return { host, origin, esArchivoLocal, esIp };
+        }
+
+        function actualizarHintGoogleLogin() {
+            if (!DOM.googleAuthHint) return;
+            const info = obtenerInfoOrigenActual();
+
+            if (info.esArchivoLocal) {
+                DOM.googleAuthHint.innerHTML = 'Google Sign-In no funciona desde <code>file://</code>. Abre Fénix desde un servidor web como Live Server o GitHub Pages.';
+                return;
+            }
+
+            const originSeguro = escapeHtml(info.origin || 'sin-origin');
+            DOM.googleAuthHint.innerHTML = `<strong>Origen:</strong> <code>${originSeguro}</code><br>Inicio de sesión listo para Google y correo.`;
+        }
+
+        function mensajeErrorGoogle(error) {
+            const info = obtenerInfoOrigenActual();
+            const hostSeguro = info.host || 'localhost';
+            const code = error?.code || '';
+
+            if (code === 'auth/unauthorized-domain') {
+                return `Google Sign-In rechazó este origen (${hostSeguro}).`;
+            }
+            if (code === 'auth/operation-not-allowed') {
+                return 'Google Sign-In está desactivado en Firebase. Ve a Authentication > Sign-in method y habilita Google.';
+            }
+            if (code === 'auth/popup-closed-by-user') {
+                return 'Se cerró la ventana de Google antes de terminar el login.';
+            }
+            if (code === 'auth/cancelled-popup-request') {
+                return '';
+            }
+            if (code === 'auth/popup-blocked') {
+                return 'El navegador bloqueó la ventana emergente. Reintenta o permite popups para este origen.';
+            }
+            if (code === 'auth/network-request-failed') {
+                return 'No hubo conexión estable con Firebase o Google. Revisa internet y vuelve a intentar.';
+            }
+            if (code === 'auth/invalid-api-key') {
+                return 'La API key de Firebase no es válida para este proyecto.';
+            }
+            if (code === 'auth/operation-not-supported-in-this-environment') {
+                return 'Este entorno no soporta popup. Probando redirección segura.';
+            }
+            return `No se pudo iniciar con Google. ${error?.message || 'Intenta otra vez en unos segundos.'}`;
+        }
+
+        async function iniciarSesionGoogle() {
+            clearError();
+            actualizarHintGoogleLogin();
+
+            const info = obtenerInfoOrigenActual();
+            if (info.esArchivoLocal) {
+                showError('Abre Fénix con Live Server. Google no funciona desde file://.');
+                return;
+            }
+
+            try {
+                if (esEntornoMovil()) {
+                    await signInWithRedirect(auth, provider);
+                }
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                console.warn('Google auth falló:', error?.code || error?.message || error);
+
+                if (['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment'].includes(error?.code || '')) {
+                    try {
+                        await signInWithRedirect(auth, provider);
+                        return;
+                    } catch (redirectError) {
+                        showError(mensajeErrorGoogle(redirectError));
+                        return;
+                    }
+                }
+
+                const mensaje = mensajeErrorGoogle(error);
+                if (mensaje) showError(mensaje);
+            }
+        }
 
         const MODO_META = {
             auto: { emoji: '✨', label: 'Modo Auto' },
@@ -1201,7 +1392,19 @@
             complejidad: 'auto',
             nota: 'Thinking profile ready · Fénix se adapta con estilo humano.'
         };
+        let feedbackPendiente = {
+            tipo: '',
+            motivo: '',
+            messageId: '',
+            respuestaIA: '',
+            metadata: {},
+            feedbackExistente: null
+        };
         const ADMIN_EMAILS = ['theferkidscompany@gmail.com'];
+        const FEEDBACK_MOTIVOS = {
+            like: ['Claro', 'Útil para estudiar', 'Buen tono', 'Rápido', 'Entendió el archivo'],
+            dislike: ['Muy largo', 'Muy corto', 'No entendió', 'Se fue del tema', 'Frío o robótico', 'Perdió el archivo', 'Faltó web']
+        };
 
         function cerrarPopoversConfiguracion() {
             DOM.popoverModo.classList.remove('open');
@@ -1261,6 +1464,7 @@
 
         function leerPreferenciasDesdeUI() {
             preferenciasActuales = {
+                ...preferenciasActuales,
                 ciudad: DOM.settingsCiudad.value.trim(),
                 intereses: DOM.settingsIntereses.value.trim(),
                 modoPreferido: DOM.settingsModoPreferido.value,
@@ -1443,7 +1647,7 @@
             DOM.adminLog.innerHTML = '<div class="admin-log-item">Consultando el corazón de Fénix...</div>';
 
             try {
-                const res = await fetch(URL_RENDER.replace('/api/chat', '/api/admin/resumen'), {
+                const res = await fetch(URL_ADMIN, {
                     headers: { 'x-admin-email': userActual?.email || '' }
                 });
                 const data = await res.json();
@@ -1469,12 +1673,165 @@
                     ];
 
                 DOM.adminLog.innerHTML = items.length
-                    ? items.map((item) => `<div class="admin-log-item"><strong>${item.titulo || 'Evento'}:</strong> ${item.detalle || ''}</div>`).join('')
+                    ? items.map((item) => `<div class="admin-log-item"><strong>${escapeHtml(item.titulo || 'Evento')}:</strong> ${escapeHtml(item.detalle || '')}</div>`).join('')
                     : '<div class="admin-log-item">Sin eventos recientes. Cuando el backend empiece a registrar alertas, feedback y entrenamientos, aparecerán aquí.</div>';
             } catch (e) {
                 DOM.adminKpiModelo.textContent = 'Local';
-                DOM.adminLog.innerHTML = '<div class="admin-log-item">El panel admin necesita el endpoint <strong>/api/admin/resumen</strong>. La interfaz ya quedó lista para conectarse.</div>';
+                DOM.adminLog.innerHTML = '<div class="admin-log-item">No se pudo consultar el panel admin en este momento. Revisa el estado del backend o el endpoint <strong>/api/health</strong>.</div>';
             }
+        }
+
+        function obtenerMensajeChatPorId(messageId) {
+            return mensajesChatActual.find((msg) => msg.id === messageId) || null;
+        }
+
+        function obtenerMensajeUsuarioRelacionado(messageId) {
+            const indice = mensajesChatActual.findIndex((msg) => msg.id === messageId);
+            if (indice <= 0) return '';
+            for (let i = indice - 1; i >= 0; i--) {
+                if (mensajesChatActual[i]?.emisor === 'user') return mensajesChatActual[i]?.texto || '';
+            }
+            return '';
+        }
+
+        function cerrarFeedbackModal() {
+            feedbackPendiente = {
+                tipo: '',
+                motivo: '',
+                messageId: '',
+                respuestaIA: '',
+                metadata: {},
+                feedbackExistente: null
+            };
+            DOM.feedbackTextarea.value = '';
+            DOM.feedbackChipGrid.innerHTML = '';
+            DOM.feedbackMeta.textContent = 'Tu feedback se guardará junto al mensaje para mejorar calidad, tono y motor.';
+            DOM.btnEnviarFeedback.disabled = false;
+            DOM.btnEnviarFeedback.textContent = 'Enviar feedback';
+            cerrarModal(DOM.feedbackModal);
+        }
+
+        function renderizarMotivosFeedback(tipo, motivoActivo = '') {
+            const opciones = FEEDBACK_MOTIVOS[tipo] || [];
+            DOM.feedbackChipGrid.innerHTML = opciones.map((motivo) => `
+                <button class="feedback-chip ${motivo === motivoActivo ? 'active' : ''}" type="button" data-feedback-chip="${escapeHtml(motivo)}">${escapeHtml(motivo)}</button>
+            `).join('');
+
+            DOM.feedbackChipGrid.querySelectorAll('[data-feedback-chip]').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    feedbackPendiente.motivo = btn.dataset.feedbackChip || '';
+                    renderizarMotivosFeedback(tipo, feedbackPendiente.motivo);
+                });
+            });
+        }
+
+        function abrirFeedbackModal(messageId, tipo) {
+            const mensaje = obtenerMensajeChatPorId(messageId);
+            if (!mensaje || mensaje.emisor !== 'ia') return;
+
+            feedbackPendiente = {
+                tipo,
+                motivo: mensaje.feedback?.tipo === tipo ? (mensaje.feedback?.motivo || '') : '',
+                messageId,
+                respuestaIA: mensaje.texto || '',
+                metadata: mensaje.metadata || {},
+                feedbackExistente: mensaje.feedback || null
+            };
+
+            DOM.feedbackModalTitle.textContent = tipo === 'like' ? 'Qué estuvo bien en esta respuesta' : 'Qué falló en esta respuesta';
+            DOM.feedbackModalSubtitle.textContent = tipo === 'like'
+                ? 'Marca rápido qué sí sirvió para que Fénix refuerce ese estilo.'
+                : 'Marca lo que no funcionó para corregir tono, longitud, contexto o motor.';
+            DOM.feedbackTextarea.value = mensaje.feedback?.tipo === tipo ? (mensaje.feedback?.correccion || '') : '';
+            DOM.feedbackMeta.textContent = `Mensaje: ${((mensaje.texto || '').trim().slice(0, 120) || 'Respuesta sin texto')}${(mensaje.texto || '').length > 120 ? '...' : ''}`;
+            renderizarMotivosFeedback(tipo, feedbackPendiente.motivo);
+            abrirModal(DOM.feedbackModal);
+        }
+
+        async function copiarTextoSeguro(texto) {
+            const limpio = (texto || '').toString();
+            if (!limpio) return false;
+
+            try {
+                await navigator.clipboard.writeText(limpio);
+                return true;
+            } catch (_) {
+                const area = document.createElement('textarea');
+                area.value = limpio;
+                area.setAttribute('readonly', 'readonly');
+                area.style.position = 'fixed';
+                area.style.top = '-1000px';
+                document.body.appendChild(area);
+                area.select();
+                const copiado = document.execCommand('copy');
+                document.body.removeChild(area);
+                return !!copiado;
+            }
+        }
+
+        async function enviarFeedbackActual() {
+            if (!userActual || !chatActualId || !feedbackPendiente.messageId || !feedbackPendiente.tipo) return;
+
+            const mensaje = obtenerMensajeChatPorId(feedbackPendiente.messageId);
+            if (!mensaje) return;
+
+            const payload = {
+                tipo: feedbackPendiente.tipo,
+                motivo: feedbackPendiente.motivo || '',
+                correccion: DOM.feedbackTextarea.value.trim(),
+                mensajeUsuario: obtenerMensajeUsuarioRelacionado(feedbackPendiente.messageId),
+                respuestaIA: mensaje.texto || '',
+                userMeta: {
+                    nombre: userActual?.displayName || document.getElementById('nombre-ui').innerText || '',
+                    email: userActual?.email || ''
+                },
+                perfilAcademico: perfilAcademicoActual,
+                modoAplicado: mensaje.metadata?.modoAplicado || ultimaDecisionIA.modo || '',
+                algoritmo: mensaje.metadata?.algoritmo || algoritmoActual || '',
+                chatId: chatActualId,
+                messageId: feedbackPendiente.messageId,
+                motor: mensaje.metadata?.motor || '',
+                complejidad: mensaje.metadata?.complejidadAplicada || '',
+                requiereGoogle: !!mensaje.metadata?.requiereGoogle,
+                origen: window.location.origin || '',
+                host: window.location.hostname || '',
+                estadoPrevio: mensaje.feedback?.tipo || ''
+            };
+
+            DOM.btnEnviarFeedback.disabled = true;
+            DOM.btnEnviarFeedback.textContent = 'Guardando...';
+
+            let resultado = { ok: false, guardado: false, almacenamiento: 'local' };
+            try {
+                const res = await fetch(URL_FEEDBACK, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                resultado = await res.json();
+            } catch (error) {
+                console.warn('Feedback backend no disponible, se guardará local.', error);
+            }
+
+            try {
+                await updateDoc(
+                    doc(db, `usuarios/${userActual.uid}/mis_chats/${chatActualId}/mensajes/${feedbackPendiente.messageId}`),
+                    {
+                        feedback: {
+                            tipo: feedbackPendiente.tipo,
+                            motivo: feedbackPendiente.motivo || '',
+                            correccion: DOM.feedbackTextarea.value.trim(),
+                            guardadoServidor: !!resultado.guardado,
+                            almacenamiento: resultado.almacenamiento || (resultado.guardado ? 'firestore' : 'local')
+                        },
+                        feedbackActualizado: serverTimestamp()
+                    }
+                );
+            } catch (error) {
+                console.warn('No se pudo persistir feedback en el chat.', error);
+            }
+
+            cerrarFeedbackModal();
         }
 
         function actualizarUIPerfil() {
@@ -1836,6 +2193,8 @@
         DOM.btnAdminPanel.addEventListener('click', abrirPanelAdmin);
         DOM.btnRefreshAdmin.addEventListener('click', refrescarPanelAdmin);
         DOM.btnCerrarAdmin.addEventListener('click', () => cerrarModal(DOM.adminModal));
+        DOM.btnCerrarFeedback.addEventListener('click', cerrarFeedbackModal);
+        DOM.btnEnviarFeedback.addEventListener('click', enviarFeedbackActual);
 
         document.querySelectorAll('[data-profile-role]').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -1856,12 +2215,18 @@
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') cerrarPopoversConfiguracion();
+            if (e.key === 'Escape') {
+                cerrarPopoversConfiguracion();
+                if (DOM.feedbackModal.classList.contains('open')) cerrarFeedbackModal();
+            }
         });
 
-        [DOM.settingsModal, DOM.adminModal].forEach((modal) => {
+        [DOM.settingsModal, DOM.adminModal, DOM.feedbackModal].forEach((modal) => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) cerrarModal(modal);
+                if (e.target === modal) {
+                    if (modal === DOM.feedbackModal) cerrarFeedbackModal();
+                    else cerrarModal(modal);
+                }
             });
         });
 
@@ -1879,15 +2244,17 @@
             DOM.error.style.display = 'none';
         });
 
-        document.getElementById('btn-google').addEventListener('click', async () => { try { await signInWithPopup(auth, provider); } catch(e) { showError("Error conectando con Google."); }});
+        document.getElementById('btn-google').addEventListener('click', iniciarSesionGoogle);
         document.getElementById('btn-login-mail').addEventListener('click', async () => { 
             try { 
+                clearError();
                 const cred = await signInWithEmailAndPassword(auth, document.getElementById('email-in').value, document.getElementById('pass-in').value); 
                 if (!cred.user.emailVerified) { showError("⚠️ Cuenta NO Verificada."); await signOut(auth); }
             } catch(e) { showError("Correo o contraseña incorrectos."); }
         });
         document.getElementById('btn-reg-mail').addEventListener('click', async () => { 
             try { 
+                clearError();
                 const cred = await createUserWithEmailAndPassword(auth, document.getElementById('email-reg').value, document.getElementById('pass-reg').value); 
                 await sendEmailVerification(cred.user);
                 DOM.authContainer.style.display = 'none'; DOM.verifyScreen.style.display = 'flex';
@@ -1896,8 +2263,31 @@
         });
         document.getElementById('btn-salir').addEventListener('click', () => signOut(auth));
 
+        DOM.mensajes.addEventListener('click', async (e) => {
+            const feedbackBtn = e.target.closest('[data-feedback-action]');
+            if (feedbackBtn) {
+                const messageId = feedbackBtn.dataset.messageId || '';
+                const tipo = feedbackBtn.dataset.feedbackAction || '';
+                if (messageId && tipo) abrirFeedbackModal(messageId, tipo);
+                return;
+            }
+
+            const copyBtn = e.target.closest('[data-copy-action]');
+            if (copyBtn) {
+                const messageId = copyBtn.dataset.messageId || '';
+                const mensaje = obtenerMensajeChatPorId(messageId);
+                if (!mensaje) return;
+                const copiado = await copiarTextoSeguro(mensaje.texto || '');
+                copyBtn.textContent = copiado ? 'Copiado' : 'No se pudo copiar';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copiar';
+                }, 1400);
+            }
+        });
+
         async function iniciarApp(user) {
             userActual = user;
+            clearError();
             DOM.login.style.display = 'none';
             DOM.app.style.display = 'flex';
 
@@ -1917,19 +2307,27 @@
             cargarHistorialDeChats();
         }
 
+        actualizarHintGoogleLogin();
+        getRedirectResult(auth).catch((error) => {
+            const mensaje = mensajeErrorGoogle(error);
+            if (mensaje) showError(mensaje);
+        });
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                if(user.providerData[0].providerId === 'password' && !user.emailVerified) return;
+                if(user.providerData?.[0]?.providerId === 'password' && !user.emailVerified) return;
                 await iniciarApp(user);
             } else {
                 userActual = null;
                 chatActualId = null;
                 chatHistorialLocal = [];
+                mensajesChatActual = [];
                 DOM.app.style.display = 'none';
                 DOM.login.style.display = 'flex';
                 DOM.btnAdminPanel.style.display = 'none';
                 if(unsubscribeMensajes) unsubscribeMensajes();
                 if(unsubscribeLista) unsubscribeLista();
+                actualizarHintGoogleLogin();
             }
         });
 
@@ -2012,6 +2410,7 @@
         function abrirChat(idChat) {
             chatActualId = idChat;
             chatHistorialLocal = [];
+            mensajesChatActual = [];
             document.querySelectorAll('.chat-item').forEach(el => el.classList.remove('active'));
             if(window.innerWidth <= 768) { DOM.sidebar.classList.remove('open'); DOM.overlay.style.display = 'none'; }
             
@@ -2022,6 +2421,7 @@
             unsubscribeMensajes = onSnapshot(q, (snapshot) => {
                 DOM.mensajes.innerHTML = '';
                 chatHistorialLocal = [];
+                mensajesChatActual = [];
 
                 if(snapshot.empty) {
                     setFraseBienvenida();
@@ -2030,12 +2430,12 @@
                 } else {
                     snapshot.forEach((docSnap) => {
                         const data = docSnap.data();
+                        mensajesChatActual.push({ id: docSnap.id, ...data });
                         chatHistorialLocal.push({ emisor: data.emisor, texto: data.texto });
-                        renderizarMensaje(data.texto, data.emisor);
+                        renderizarMensaje(data.texto, data.emisor, data, docSnap.id);
                     });
                     scrollAbajo();
                 }
-
                 requestAnimationFrame(() => {
                     const activo = DOM.listaChats.querySelector(`[data-chat-id="${idChat}"]`);
                     if (activo) activo.classList.add('active');
@@ -2182,7 +2582,7 @@
 
             iaEstaPensando = true;
             DOM.input.disabled = true;
-            DOM.input.placeholder = 'Fénix está pensando... (Toca 🟥 para cancelar)';
+            DOM.input.placeholder = 'Fénix está pensando... (Toca stop para cancelar)';
             DOM.btnAdjuntar.disabled = true;
             DOM.btnSugerencia.disabled = true;
             DOM.iconoEnviar.style.display = 'none';
@@ -2207,8 +2607,24 @@
                     body: JSON.stringify(payload),
                     signal: controladorPeticion.signal
                 });
-                const data = await res.json();
+                const raw = await res.text();
+                let data = {};
+
+                try {
+                    data = raw ? JSON.parse(raw) : {};
+                } catch (_) {
+                    data = {
+                        error: resumirErrorServidor(raw, res.status)
+                    };
+                }
+                if (!data.respuesta) {
+                    data.error = resumirErrorServidor(data.error || raw, res.status);
+                }
                 document.getElementById(idBurbujaCarga)?.remove();
+
+                if (!res.ok && !data.respuesta) {
+                    throw new Error(data.error || `El núcleo respondió con estado ${res.status}.`);
+                }
 
                 if (data.tituloNuevo && necesitaTitulo) {
                     await updateDoc(refChatPrincipal, {
@@ -2233,17 +2649,39 @@
                 }
 
                 if (data.respuesta) {
-                    await addDoc(refMensajes, { texto: data.respuesta, emisor: 'ia', timestamp: serverTimestamp() });
+                    await addDoc(refMensajes, {
+                        texto: data.respuesta,
+                        emisor: 'ia',
+                        timestamp: serverTimestamp(),
+                        metadata: {
+                            motor: data.motor || '',
+                            modoAplicado: data.modoAplicado || '',
+                            complejidadAplicada: data.complejidadAplicada || '',
+                            algoritmo: algoritmoActual || '',
+                            requiereGoogle: !!data.requiereGoogle,
+                            errorTecnico: !!data.errorTecnico
+                        },
+                        feedback: null
+                    });
                 } else if (data.error) {
-                    await addDoc(refMensajes, { texto: '⚠️ ' + data.error, emisor: 'ia', timestamp: serverTimestamp() });
+                    await addDoc(refMensajes, {
+                        texto: `No pude completar esa respuesta ahora mismo. ${data.error}`,
+                        emisor: 'ia',
+                        timestamp: serverTimestamp()
+                    });
                 }
 
             } catch (error) {
                 document.getElementById(idBurbujaCarga)?.remove();
                 if (error.name === 'AbortError') {
-                    await addDoc(refMensajes, { texto: '🚫 *Generación detenida por el estudiante.*', emisor: 'ia sistema', timestamp: serverTimestamp() });
+                    await addDoc(refMensajes, { texto: 'Generación detenida por el estudiante.', emisor: 'ia sistema', timestamp: serverTimestamp() });
                 } else {
-                    await addDoc(refMensajes, { texto: '🔌 Error cuántico o servidor apagado. Intenta de nuevo.', emisor: 'ia', timestamp: serverTimestamp() });
+                    const detalle = resumirErrorServidor(error?.message || '');
+                    await addDoc(refMensajes, {
+                        texto: `No pude conectar con el núcleo de Fénix en este momento.${detalle ? ` ${detalle}` : ' Reintenta en unos segundos.'}`,
+                        emisor: 'ia',
+                        timestamp: serverTimestamp()
+                    });
                 }
             } finally {
                 iaEstaPensando = false;
@@ -2259,29 +2697,53 @@
             }
         }
 
+        function resumirErrorServidor(raw, status = 0) {
+            const bruto = (raw || '').toString().trim();
+            if (!bruto) return status ? `El servidor respondió con estado ${status}.` : '';
+
+            if (/<!doctype html|<html|<head|<body|<pre/i.test(bruto)) {
+                const detallePre = bruto.match(/<pre[^>]*>([\s\S]*?)<\/pre>/i)?.[1]?.trim();
+                const detalleTitulo = bruto.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.trim();
+                const detalle = detallePre || detalleTitulo || `estado ${status || 500}`;
+                return `El backend devolvió un error interno: ${detalle}.`;
+            }
+
+            return bruto.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
         function normalizarTextoTecnico(texto) {
-    let t = (texto || '').toString();
+            const aSuperindice = (char) => ({ '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '+': '⁺', '-': '⁻' })[char] || char;
+            const aSubindice = (char) => ({ '0': '₀', '1': '₁', '2': '₂', '3': '₃', '4': '₄', '5': '₅', '6': '₆', '7': '₇', '8': '₈', '9': '₉', '+': '₊', '-': '₋' })[char] || char;
+            let t = (texto || '').toString();
 
-    t = t.replace(/\r\n/g, '\n');
-    t = t.replace(/\\begin\{aligned\}|\\end\{aligned\}/g, '');
-    t = t.replace(/\\left|\\right/g, '');
-    t = t.replace(/\\\[/g, '').replace(/\\\]/g, '');
-    t = t.replace(/\\\(/g, '').replace(/\\\)/g, '');
-    t = t.replace(/\$\$/g, '');
-    t = t.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1)/($2)');
-    t = t.replace(/\\sqrt\{([^{}]+)\}/g, '√($1)');
-    t = t.replace(/\\times/g, '×').replace(/\\cdot/g, '·').replace(/\\div/g, '÷');
-    t = t.replace(/\\pi/g, 'π').replace(/\\theta/g, 'θ').replace(/\\alpha/g, 'α');
-    t = t.replace(/\\beta/g, 'β').replace(/\\gamma/g, 'γ').replace(/\\delta/g, 'δ');
-    t = t.replace(/\\leq/g, '≤').replace(/\\geq/g, '≥').replace(/\\neq/g, '≠');
-    t = t.replace(/\\text\{([^{}]+)\}/g, '$1');
-    t = t.replace(/\\\\/g, '\n');
-    t = t.replace(/\s{2,}/g, ' ');
-    t = t.replace(/\n\s*\n\s*\n+/g, '\n\n');
-    return t;
-}
+            if (/<!doctype html|<html|<head|<body|<pre/i.test(t)) {
+                return resumirErrorServidor(t);
+            }
 
-function formatearTextoIA(texto) {
+            t = t.replace(/\r\n/g, '\n');
+            t = t.replace(/\\begin\{(?:aligned|align\*?|cases)\}|\\end\{(?:aligned|align\*?|cases)\}/g, '');
+            t = t.replace(/\\left|\\right/g, '');
+            t = t.replace(/\\\[/g, '').replace(/\\\]/g, '');
+            t = t.replace(/\\\(/g, '').replace(/\\\)/g, '');
+            t = t.replace(/\$\$/g, '').replace(/\$/g, '');
+            t = t.replace(/\\d?frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1)/($2)');
+            t = t.replace(/\\sqrt\{([^{}]+)\}/g, '√($1)');
+            t = t.replace(/\\times/g, '×').replace(/\\cdot/g, '·').replace(/\\div/g, '÷');
+            t = t.replace(/\\pi/g, 'π').replace(/\\theta/g, 'θ').replace(/\\alpha/g, 'α');
+            t = t.replace(/\\beta/g, 'β').replace(/\\gamma/g, 'γ').replace(/\\delta/g, 'δ');
+            t = t.replace(/\\leq/g, '≤').replace(/\\geq/g, '≥').replace(/\\neq/g, '≠');
+            t = t.replace(/\\pm/g, '±').replace(/\\approx/g, '≈').replace(/\\sum/g, 'Σ').replace(/\\int/g, '∫').replace(/\\infty/g, '∞');
+            t = t.replace(/\\rightarrow|\\to/g, '→');
+            t = t.replace(/\\text\{([^{}]+)\}|\\mathrm\{([^{}]+)\}|\\operatorname\{([^{}]+)\}/g, (_, a, b, c) => a || b || c || '');
+            t = t.replace(/\^([0-9+-]+)/g, (_, exp) => [...exp].map(aSuperindice).join(''));
+            t = t.replace(/_([0-9+-]+)/g, (_, exp) => [...exp].map(aSubindice).join(''));
+            t = t.replace(/\\\\/g, '\n');
+            t = t.replace(/\s{2,}/g, ' ');
+            t = t.replace(/\n\s*\n\s*\n+/g, '\n\n');
+            return t.trim();
+        }
+
+function formatearTextoIA_legado(texto) {
             let html = normalizarTextoTecnico(texto || '');
             html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
             html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre style="background:rgba(0,0,0,0.35); padding:12px; border-radius:12px; overflow:auto; border:1px solid rgba(255,255,255,0.08); margin:8px 0;"><code>${code.trim()}</code></pre>`);
@@ -2293,7 +2755,7 @@ function formatearTextoIA(texto) {
             return html;
         }
 
-        function renderizarMensaje(texto, emisor) {
+        function renderizarMensajeLegado(texto, emisor) {
             const esUser = emisor === "user";
             const esSistema = emisor === "ia sistema"; // Para el mensaje de "Generación detenida"
             const textoFinal = esUser ? texto.replace(/\n/g, '<br>') : formatearTextoIA(texto);
@@ -2304,6 +2766,69 @@ function formatearTextoIA(texto) {
                     <div class="burbuja ${esUser ? 'user' : 'ia'} ${esSistema ? 'sistema' : ''}">${textoFinal}</div>
                 </div>
             `;
+            DOM.mensajes.insertAdjacentHTML('beforeend', html);
+        }
+
+        function formatearTextoUsuario(texto) {
+            let bruto = (texto || '').toString();
+            let badgeHtml = '';
+
+            bruto = bruto.replace(/^<span class="adjunto-badge">([\s\S]*?)<\/span>/, (_, badge) => {
+                badgeHtml = `<span class="adjunto-badge">${escapeHtml(badge)}</span>`;
+                return '';
+            });
+
+            return badgeHtml + escapeHtml(bruto).replace(/\n/g, '<br>');
+        }
+
+        function formatearTextoIA(texto) {
+            let html = escapeHtml(normalizarTextoTecnico(texto || ''));
+            html = html.replace(/```([\s\S]*?)```/g, (_, code) => `<pre style="background:rgba(0,0,0,0.35); padding:12px; border-radius:12px; overflow:auto; border:1px solid rgba(255,255,255,0.08); margin:8px 0;"><code>${code.trim()}</code></pre>`);
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/`(.*?)`/g, '<code style="background:rgba(0,229,255,0.1); padding:2px 5px; border-radius:4px; color:var(--accent);">$1</code>');
+            html = html.replace(/(^|\n)[\-\*]\s+(.+)/g, '$1• $2');
+            html = html.replace(/\n/g, '<br>');
+            return html;
+        }
+
+        function renderizarMensaje(texto, emisor, data = {}, messageId = '') {
+            const esUser = emisor === 'user';
+            const esSistema = emisor === 'ia sistema';
+            const feedback = data?.feedback || null;
+            const textoFinal = esUser ? formatearTextoUsuario(texto) : formatearTextoIA(texto);
+            const likeActivo = feedback?.tipo === 'like';
+            const dislikeActivo = feedback?.tipo === 'dislike';
+            const estadoFeedback = feedback?.tipo
+                ? `<div class="assistant-feedback-state">Feedback ${feedback.guardadoServidor ? 'guardado' : 'local'}${feedback.motivo ? ` · ${escapeHtml(feedback.motivo)}` : ''}</div>`
+                : '';
+            const herramientasIA = !esSistema && messageId
+                ? `
+                    <div class="assistant-mini-tools">
+                        <button class="mini-tool ${likeActivo ? 'active' : ''}" type="button" data-feedback-action="like" data-message-id="${escapeHtml(messageId)}">👍 Útil</button>
+                        <button class="mini-tool negative ${dislikeActivo ? 'active' : ''}" type="button" data-feedback-action="dislike" data-message-id="${escapeHtml(messageId)}">👎 No útil</button>
+                        <button class="mini-tool" type="button" data-copy-action="copy" data-message-id="${escapeHtml(messageId)}">Copiar</button>
+                    </div>
+                `
+                : '';
+
+            const html = esUser
+                ? `
+                    <div class="fila-msg user" data-message-id="${escapeHtml(messageId)}">
+                        <div class="burbuja user">${textoFinal}</div>
+                    </div>
+                `
+                : `
+                    <div class="fila-msg ia" data-message-id="${escapeHtml(messageId)}">
+                        <img src="${RUTA_LOGO}" class="avatar-ia" onerror="this.style.display='none'">
+                        <div class="assistant-stack">
+                            <div class="burbuja ia ${esSistema ? 'sistema' : ''}">${textoFinal}</div>
+                            ${herramientasIA}
+                            ${estadoFeedback}
+                        </div>
+                    </div>
+                `;
+
             DOM.mensajes.insertAdjacentHTML('beforeend', html);
         }
 
@@ -2318,3 +2843,4 @@ function formatearTextoIA(texto) {
     </script>
 </body>
 </html>
+
