@@ -1133,6 +1133,8 @@
         let perfilAcademicoActual = null;
         let algoritmoActual = 'equilibrado';
         let perfilTemporalSeleccionado = 'secundaria';
+        let modoManualFijo = 'politico';
+        let memoriaManualFija = 'normal';
 
         let preferenciasActuales = {
             ciudad: 'Zarumilla, Perú',
@@ -1259,10 +1261,10 @@
 
         function detectarModoAutomatico(texto) {
             const t = (texto || '').toLowerCase();
-            if (preferenciasActuales.modoPreferido) return preferenciasActuales.modoPreferido;
             if (/explica|enseñ|aprend|estudia|ejercicio|tarea|examen|exposici|resumen|biolog|matem|física|química|ingles|inglés/.test(t)) return 'estudio';
             if (/idea|cartel|cuento|poema|logo|imagen|historia|crea|diseña|disena|parodia/.test(t)) return 'creativo';
             if (/opina|debate|analiza|compara|pros y contras|ventajas|desventajas|porque|por qué|caso|corrupción|corrupcion/.test(t)) return 'analitico';
+            if (preferenciasActuales.modoPreferido) return preferenciasActuales.modoPreferido;
             return 'politico';
         }
 
@@ -1316,13 +1318,19 @@
             let memoria = DOM.selectMemoria.value || 'auto';
             const algoritmo = algoritmoActual || 'equilibrado';
 
-            if (preferenciasActuales.autoMode || modo === 'auto') {
+            if (preferenciasActuales.autoMode) {
                 modo = detectarModoAutomatico(texto);
+                DOM.selectTemperamento.value = modo;
+            } else if (modo === 'auto') {
+                modo = modoManualFijo || preferenciasActuales.modoPreferido || ultimaDecisionIA.modo || 'politico';
                 DOM.selectTemperamento.value = modo;
             }
 
-            if (preferenciasActuales.autoMemory || memoria === 'auto') {
+            if (preferenciasActuales.autoMemory) {
                 memoria = detectarMemoriaAutomatica(texto);
+                DOM.selectMemoria.value = memoria;
+            } else if (memoria === 'auto') {
+                memoria = memoriaManualFija || 'normal';
                 DOM.selectMemoria.value = memoria;
             }
 
@@ -1443,6 +1451,7 @@
             }
             if (manual && valor !== 'auto') {
                 preferenciasActuales.autoMode = false;
+                modoManualFijo = valor;
                 actualizarSwitch(DOM.toggleAutoMode, false);
             }
             actualizarUIConfig();
@@ -1459,6 +1468,7 @@
             }
             if (manual && valor !== 'auto') {
                 preferenciasActuales.autoMemory = false;
+                memoriaManualFija = valor;
                 actualizarSwitch(DOM.toggleAutoMemory, false);
             }
             actualizarUIConfig();
@@ -1511,6 +1521,8 @@
                     ? { ...preferenciasActuales, ...snap.data().preferenciasFenix }
                     : preferenciasActuales;
                 if (perfilAcademicoActual?.rol) perfilTemporalSeleccionado = perfilAcademicoActual.rol;
+                if (!preferenciasActuales.autoMode && cfg.modo && cfg.modo !== 'auto') modoManualFijo = cfg.modo;
+                if (!preferenciasActuales.autoMemory && cfg.memoria && cfg.memoria !== 'auto') memoriaManualFija = cfg.memoria;
             } catch (e) {
                 DOM.selectTemperamento.value = 'politico';
                 DOM.selectMemoria.value = 'normal';
@@ -2091,12 +2103,23 @@
 
         function normalizarTextoTecnico(texto) {
     let t = (texto || '').toString();
+
+    t = t.replace(/\r\n/g, '\n');
+    t = t.replace(/\\begin\{aligned\}|\\end\{aligned\}/g, '');
+    t = t.replace(/\\left|\\right/g, '');
     t = t.replace(/\\\[/g, '').replace(/\\\]/g, '');
     t = t.replace(/\\\(/g, '').replace(/\\\)/g, '');
-    t = t.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '$1/$2');
-    t = t.replace(/\\times/g, '×').replace(/\\cdot/g, '·');
-    t = t.replace(/\\pi/g, 'π');
+    t = t.replace(/\$\$/g, '');
+    t = t.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1)/($2)');
     t = t.replace(/\\sqrt\{([^{}]+)\}/g, '√($1)');
+    t = t.replace(/\\times/g, '×').replace(/\\cdot/g, '·').replace(/\\div/g, '÷');
+    t = t.replace(/\\pi/g, 'π').replace(/\\theta/g, 'θ').replace(/\\alpha/g, 'α');
+    t = t.replace(/\\beta/g, 'β').replace(/\\gamma/g, 'γ').replace(/\\delta/g, 'δ');
+    t = t.replace(/\\leq/g, '≤').replace(/\\geq/g, '≥').replace(/\\neq/g, '≠');
+    t = t.replace(/\\text\{([^{}]+)\}/g, '$1');
+    t = t.replace(/\\\\/g, '\n');
+    t = t.replace(/\s{2,}/g, ' ');
+    t = t.replace(/\n\s*\n\s*\n+/g, '\n\n');
     return t;
 }
 
